@@ -16,6 +16,9 @@ const mockStorage = vi.mocked(AsyncStorage);
 const state: StoredAppState = {
   profile: { grade: 9, goalId: 'school-support' },
   diagnosticDraft: { grade: 9, answers: { q1: 1 }, currentIndex: 1 },
+  lessonDrafts: {},
+  masteryStates: {},
+  mistakeRecords: [],
   completedLessonIds: ['lesson-present-simple-01'],
   completedSessions: 2,
 };
@@ -45,6 +48,9 @@ describe('local app storage', () => {
     }))).toEqual({
       completedLessonIds: [],
       completedSessions: 0,
+      lessonDrafts: {},
+      masteryStates: {},
+      mistakeRecords: [],
     });
   });
 

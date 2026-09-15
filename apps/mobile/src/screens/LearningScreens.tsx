@@ -1,19 +1,36 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Lesson, PronunciationPrompt } from '../domain/models';
+import type { Lesson, LessonDraft, PronunciationPrompt } from '../domain/models';
 import { BackButton, Button, Icon, Pill, ProgressBar, Screen, TextButton } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
 
-export function LessonScreen({ lesson, onBack, onComplete }: { lesson: Lesson; onBack: () => void; onComplete: () => void }) {
-  const [selected, setSelected] = useState<number>();
-  const [checked, setChecked] = useState(false);
+export function LessonScreen({ lesson, initialDraft, onProgress, onChecked, onBack, onComplete }: {
+  lesson: Lesson;
+  initialDraft?: LessonDraft;
+  onProgress?: (lessonId: string, selectedOptionIndex: number | undefined, checked: boolean) => void;
+  onChecked?: (lesson: Lesson, selectedOptionIndex: number) => void;
+  onBack: () => void;
+  onComplete: () => void;
+}) {
+  const [selected, setSelected] = useState<number | undefined>(initialDraft?.selectedOptionIndex);
+  const [checked, setChecked] = useState(initialDraft?.checked ?? false);
   const [reported, setReported] = useState(false);
   const correct = selected === lesson.question.correctOptionIndex;
+
+  useEffect(() => {
+    onProgress?.(lesson.id, selected, checked);
+  }, [checked, lesson.id, onProgress, selected]);
+
+  const checkAnswer = () => {
+    if (selected === undefined) return;
+    setChecked(true);
+    onChecked?.(lesson, selected);
+  };
 
   return (
     <Screen
       testID="lesson-screen"
-      footer={<Button label={checked ? 'Hoàn thành bài' : 'Kiểm tra đáp án'} onPress={checked ? onComplete : () => setChecked(true)} disabled={selected === undefined} icon={checked ? 'check' : 'arrow-right'} />}
+      footer={<Button label={checked ? 'Hoàn thành bài' : 'Kiểm tra đáp án'} onPress={checked ? onComplete : checkAnswer} disabled={selected === undefined} icon={checked ? 'check' : 'arrow-right'} />}
     >
       <View style={styles.lessonTop}><BackButton onPress={onBack} /><Pill tone="primary">8 phút</Pill></View>
       <Text style={styles.stepLabel}>HIỂU · BƯỚC 1/4</Text>

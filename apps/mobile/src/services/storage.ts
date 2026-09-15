@@ -19,16 +19,25 @@ function isStoredState(value: unknown): value is StoredAppState {
     && typeof value.completedSessions === 'number';
 }
 
+function normalizeStoredState(state: StoredAppState): StoredAppState {
+  return {
+    ...state,
+    lessonDrafts: isRecord(state.lessonDrafts) ? state.lessonDrafts : {},
+    masteryStates: isRecord(state.masteryStates) ? state.masteryStates : {},
+    mistakeRecords: Array.isArray(state.mistakeRecords) ? state.mistakeRecords : [],
+  };
+}
+
 export function parseStoredAppState(serialized: string): StoredAppState | null {
   try {
     const parsed: unknown = JSON.parse(serialized);
 
     if (isRecord(parsed) && 'schemaVersion' in parsed && 'state' in parsed) {
       const envelope = parsed as Partial<StoredEnvelope>;
-      return isStoredState(envelope.state) ? envelope.state : null;
+      return isStoredState(envelope.state) ? normalizeStoredState(envelope.state) : null;
     }
 
-    return isStoredState(parsed) ? parsed : null;
+    return isStoredState(parsed) ? normalizeStoredState(parsed) : null;
   } catch {
     return null;
   }

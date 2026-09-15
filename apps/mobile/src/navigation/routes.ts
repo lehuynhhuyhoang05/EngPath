@@ -9,4 +9,5 @@ export type AppRoute =
   | 'lesson'
   | 'pronunciation'
   | 'exam'
+  | 'mistakes'
   | 'profile';

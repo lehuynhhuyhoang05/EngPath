@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GOALS, LESSONS_BY_SKILL, SKILLS } from '../data/seed';
 import { evidenceConfidence, learningBand, sortSkillsForReview } from '../domain/diagnosticPresentation';
-import { recommendSkillId } from '../domain/recommendation';
-import type { LearnerProfile, Lesson, StoredAppState } from '../domain/models';
+import { skillScoresFromMastery } from '../domain/mastery';
+import { activeMistakes } from '../domain/mistakes';
+import { recommendSkillIdForState } from '../domain/recommendation';
+import type { LearnerProfile, Lesson, MistakeRecord, StoredAppState } from '../domain/models';
 import { BackButton, Button, EmptyState, Icon, Pill, Screen, TextButton } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
 
@@ -18,16 +20,18 @@ function Header({ title, eyebrow, onProfile }: { title: string; eyebrow: string;
   );
 }
 
-export function TodayScreen({ state, onLesson, onPronunciation, onExam, onProfile }: {
+export function TodayScreen({ state, onLesson, onPronunciation, onExam, onMistakes, onProfile }: {
   state: StoredAppState;
   onLesson: () => void;
   onPronunciation: () => void;
   onExam: () => void;
+  onMistakes: () => void;
   onProfile: () => void;
 }) {
-  const priorityId = recommendSkillId(state.diagnostic, SKILLS);
+  const priorityId = recommendSkillIdForState(state, SKILLS);
   const lesson = LESSONS_BY_SKILL[priorityId] ?? LESSONS_BY_SKILL['present-simple'];
   const examFocus = state.profile?.grade === 9 && state.profile.goalId === 'exam-10';
+  const mistakes = activeMistakes(state.mistakeRecords);
 
   return (
     <Screen testID="today-screen">
@@ -47,6 +51,7 @@ export function TodayScreen({ state, onLesson, onPronunciation, onExam, onProfil
       </View>
 
       <Text style={styles.sectionTitle}>Ôn lại hôm nay</Text>
+      {mistakes.length ? <ActionRow icon="rotate" title="Ôn lỗi sai" meta={`${mistakes.length} câu cần xem lại`} onPress={onMistakes} /> : null}
       <ActionRow icon="mic" title="Phát âm âm /θ/" meta="3 phút · Bản mô phỏng" onPress={onPronunciation} />
 
       {examFocus ? (
@@ -64,7 +69,7 @@ export function TodayScreen({ state, onLesson, onPronunciation, onExam, onProfil
 
 export function LearnScreen({ state, onLesson, onProfile }: { state: StoredAppState; onLesson: (lesson: Lesson) => void; onProfile: () => void }) {
   const lessons = useMemo(() => Object.values(LESSONS_BY_SKILL).filter((lesson) => lesson.grade <= (state.profile?.grade ?? 9)), [state.profile?.grade]);
-  const recommendedSkillId = useMemo(() => recommendSkillId(state.diagnostic, SKILLS), [state.diagnostic]);
+  const recommendedSkillId = useMemo(() => recommendSkillIdForState({ diagnostic: state.diagnostic, masteryStates: state.masteryStates }, SKILLS), [state.diagnostic, state.masteryStates]);
   return (
     <Screen>
       <Header eyebrow={`BÀI HỌC · LỚP ${state.profile?.grade ?? 9}`} title="Chọn một bài để học" onProfile={onProfile} />
@@ -90,7 +95,15 @@ export function LearnScreen({ state, onLesson, onProfile }: { state: StoredAppSt
   );
 }
 
-export function PracticeScreen({ profile, onPronunciation, onExam, onProfile }: { profile: LearnerProfile; onPronunciation: () => void; onExam: () => void; onProfile: () => void }) {
+export function PracticeScreen({ state, onPronunciation, onExam, onMistakes, onProfile }: {
+  state: StoredAppState;
+  onPronunciation: () => void;
+  onExam: () => void;
+  onMistakes: () => void;
+  onProfile: () => void;
+}) {
+  const mistakes = activeMistakes(state.mistakeRecords);
+  const profile = state.profile;
   return (
     <Screen>
       <Header eyebrow="LUYỆN" title="Phát âm và ôn lỗi sai" onProfile={onProfile} />
@@ -102,13 +115,13 @@ export function PracticeScreen({ profile, onPronunciation, onExam, onProfile }: 
       </View>
 
       <Text style={styles.sectionTitle}>Luyện thêm</Text>
-      <View style={styles.secondaryCard}>
-        <Icon name="rotate" color={colors.muted} />
-        <View style={{ flex: 1 }}><Text style={styles.actionTitle}>Sổ lỗi sai</Text><Text style={styles.actionMeta}>Chưa có câu đến hạn ôn lại</Text></View>
-        <Pill tone="neutral">Sắp có</Pill>
-      </View>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Mở sổ lỗi sai. ${mistakes.length ? `${mistakes.length} câu cần ôn lại` : 'Chưa có câu cần ôn lại'}`} onPress={onMistakes} style={({ pressed }) => [styles.secondaryCard, pressed && styles.pressed]}>
+        <Icon name="rotate" color={mistakes.length ? colors.primary : colors.muted} />
+        <View style={{ flex: 1 }}><Text style={styles.actionTitle}>Sổ lỗi sai</Text><Text style={styles.actionMeta}>{mistakes.length ? `${mistakes.length} câu cần ôn lại` : 'Trả lời sai trong bài học để EngPath lưu vào đây'}</Text></View>
+        <Pill tone={mistakes.length ? 'primary' : 'neutral'}>{mistakes.length ? 'Ôn ngay' : 'Trống'}</Pill>
+      </Pressable>
 
-      {profile.grade === 9 ? (
+      {profile?.grade === 9 ? (
         <Pressable accessibilityRole="button" accessibilityLabel="Mở khu ôn thi vào lớp 10" onPress={onExam} style={({ pressed }) => [styles.examCard, pressed && styles.pressed]}>
           <View style={styles.examIcon}><Icon name="flag" color={colors.warning} /></View>
           <View style={{ flex: 1 }}><Text style={styles.actionTitle}>Ôn thi vào lớp 10</Text><Text style={styles.actionMeta}>Không gian riêng cho dạng đề và mục tiêu điểm</Text></View>
@@ -121,9 +134,52 @@ export function PracticeScreen({ profile, onPronunciation, onExam, onProfile }: 
   );
 }
 
+export function MistakeNotebookScreen({ records, onBack, onRetry }: {
+  records: MistakeRecord[];
+  onBack: () => void;
+  onRetry: (lessonId: string) => void;
+}) {
+  const mistakes = activeMistakes(records);
+  const resolvedCount = records.filter((record) => record.status === 'resolved').length;
+
+  return (
+    <Screen footer={<Button label="Quay về khu Luyện" onPress={onBack} tone="secondary" icon="arrow-left" />}>
+      <BackButton onPress={onBack} />
+      <Text style={styles.screenTitle}>Sổ lỗi sai</Text>
+      <Text style={styles.lead}>EngPath giữ lại câu từng làm sai để em ôn đúng chỗ, không cần tự nhớ mình vướng ở đâu.</Text>
+
+      <View style={styles.mistakeSummary}>
+        <Text style={styles.summaryStrong}>{mistakes.length} câu cần ôn</Text>
+        <View style={styles.summaryDot} />
+        <Text style={styles.summaryText}>{resolvedCount} câu đã sửa được</Text>
+      </View>
+
+      {mistakes.length ? (
+        <View style={styles.mistakeList}>
+          {mistakes.map((record, index) => (
+            <View key={record.questionId} style={styles.mistakeItem}>
+              <Text style={styles.skillNumber}>{String(index + 1).padStart(2, '0')}</Text>
+              <View style={styles.mistakeContent}>
+                <Text style={styles.pathTitle}>{SKILLS[record.skillId].title}</Text>
+                <Text style={styles.mistakePrompt}>{record.prompt}</Text>
+                <Text style={styles.mistakeMeta}>Em chọn: {record.selectedOption} · Đáp án: {record.correctOption}</Text>
+                <Text style={styles.mistakeExplain}>{record.commonErrorVi}</Text>
+                <Button label="Ôn lại bài này" onPress={() => onRetry(record.lessonId)} tone="secondary" icon="rotate" />
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <EmptyState icon="rotate" title="Chưa có lỗi cần ôn" body="Khi em chọn sai trong bài học, câu đó sẽ xuất hiện ở đây cùng giải thích và nút thử lại." />
+      )}
+    </Screen>
+  );
+}
+
 export function ProgressScreen({ state, onProfile, onLesson }: { state: StoredAppState; onProfile: () => void; onLesson: () => void }) {
-  const scores = sortSkillsForReview(state.diagnostic?.skillScores ?? []);
-  const priorityId = recommendSkillId(state.diagnostic, SKILLS);
+  const masteryScores = skillScoresFromMastery(state.masteryStates);
+  const scores = sortSkillsForReview(masteryScores.length ? masteryScores : state.diagnostic?.skillScores ?? []);
+  const priorityId = recommendSkillIdForState(state, SKILLS);
   const priority = scores.length ? SKILLS[priorityId] : undefined;
   return (
     <Screen>
@@ -217,7 +273,7 @@ export function ProfileScreen({ profile, onBack, onReset }: { profile: LearnerPr
 }
 
 function Step({ text }: { text: string }) { return <View style={styles.step}><View style={styles.stepDot} /><Text style={styles.stepText}>{text}</Text></View>; }
-function ActionRow({ icon, title, meta, onPress }: { icon: 'mic'; title: string; meta: string; onPress: () => void }) { return <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${meta}`} onPress={onPress} style={({ pressed }) => [styles.actionRow, pressed && styles.pressed]}><View style={styles.actionIcon}><Icon name={icon} color={colors.primary} /></View><View style={{ flex: 1 }}><Text style={styles.actionTitle}>{title}</Text><Text style={styles.actionMeta}>{meta}</Text></View><Icon name="arrow-right" color={colors.muted} /></Pressable>; }
+function ActionRow({ icon, title, meta, onPress }: { icon: 'mic' | 'rotate'; title: string; meta: string; onPress: () => void }) { return <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${meta}`} onPress={onPress} style={({ pressed }) => [styles.actionRow, pressed && styles.pressed]}><View style={styles.actionIcon}><Icon name={icon} color={colors.primary} /></View><View style={{ flex: 1 }}><Text style={styles.actionTitle}>{title}</Text><Text style={styles.actionMeta}>{meta}</Text></View><Icon name="arrow-right" color={colors.muted} /></Pressable>; }
 function PreviewRow({ icon, title, body }: { icon: 'target' | 'chart' | 'clock'; title: string; body: string }) { return <View style={styles.previewRow}><View style={styles.actionIcon}><Icon name={icon} color={colors.primary} /></View><View style={{ flex: 1 }}><Text style={styles.actionTitle}>{title}</Text><Text style={styles.actionMeta}>{body}</Text></View></View>; }
 function EvidenceMeter({ observations }: { observations: number }) {
   return (
@@ -273,6 +329,13 @@ const styles = StyleSheet.create({
   practiceTitle: { ...type.title, color: colors.ink, marginTop: spacing.md },
   practiceBody: { ...type.body, color: colors.muted, marginTop: spacing.xs, marginBottom: spacing.md },
   secondaryCard: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line },
+  mistakeSummary: { minHeight: 54, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.xs, marginBottom: spacing.lg, borderBottomWidth: 1, borderBottomColor: colors.line },
+  mistakeList: { borderTopWidth: 1, borderTopColor: colors.line },
+  mistakeItem: { flexDirection: 'row', gap: spacing.sm, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.line },
+  mistakeContent: { flex: 1, gap: spacing.xs },
+  mistakePrompt: { ...type.bodyStrong, color: colors.inkSoft },
+  mistakeMeta: { ...type.caption, color: colors.danger },
+  mistakeExplain: { ...type.body, color: colors.muted, marginBottom: spacing.xs },
   examCard: { minHeight: 84, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderLeftWidth: 3, borderLeftColor: colors.warning, padding: spacing.sm, backgroundColor: colors.warningSoft, marginTop: spacing.md },
   gradeNote: { borderLeftWidth: 3, borderLeftColor: colors.lineStrong, padding: spacing.md, marginTop: spacing.md },
   gradeNoteText: { ...type.caption, color: colors.muted },

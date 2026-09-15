@@ -75,6 +75,13 @@ export interface SkillScore {
   total: number;
 }
 
+export type MasteryConfidence = 'low' | 'medium' | 'high';
+
+export interface MasteryState extends SkillScore {
+  confidence: MasteryConfidence;
+  updatedAt: string;
+}
+
 export interface DiagnosticResult {
   overallScore: number;
   strongestSkillId: string;
@@ -89,10 +96,34 @@ export interface DiagnosticDraft {
   currentIndex: number;
 }
 
+export interface LessonDraft {
+  lessonId: string;
+  selectedOptionIndex?: number;
+  checked: boolean;
+  updatedAt: string;
+}
+
+export interface MistakeRecord {
+  questionId: string;
+  lessonId: string;
+  skillId: string;
+  prompt: string;
+  selectedOption: string;
+  correctOption: string;
+  explanationVi: string;
+  commonErrorVi: string;
+  attempts: number;
+  lastAnsweredAt: string;
+  status: 'active' | 'resolved';
+}
+
 export interface StoredAppState {
   profile?: LearnerProfile;
   diagnosticDraft?: DiagnosticDraft;
   diagnostic?: DiagnosticResult;
+  lessonDrafts: Record<string, LessonDraft>;
+  masteryStates: Record<string, MasteryState>;
+  mistakeRecords: MistakeRecord[];
   completedLessonIds: string[];
   completedSessions: number;
   pronunciationBestScore?: number;

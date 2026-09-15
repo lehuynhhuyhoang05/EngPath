@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DiagnosticResult } from './models';
-import { recommendSkillId } from './recommendation';
+import { recommendSkillId, recommendSkillIdForState } from './recommendation';
 
 const skills = {
   foundation: { id: 'foundation', title: 'Foundation', area: 'Ngữ pháp' as const, minimumGrade: 6 as const, prerequisiteIds: [] },
@@ -41,5 +41,31 @@ describe('recommendSkillId', () => {
     expect(recommendSkillId(result([
       { skillId: 'target', score: 20, correct: 1, total: 5 },
     ]), skills)).toBe('foundation');
+  });
+
+  it('uses updated mastery evidence before the original diagnostic result', () => {
+    expect(recommendSkillIdForState({
+      diagnostic: result([
+        { skillId: 'target', score: 20, correct: 1, total: 5 },
+      ]),
+      masteryStates: {
+        foundation: {
+          skillId: 'foundation',
+          score: 80,
+          correct: 4,
+          total: 5,
+          confidence: 'high',
+          updatedAt: '2026-09-15T00:00:00.000Z',
+        },
+        target: {
+          skillId: 'target',
+          score: 35,
+          correct: 1,
+          total: 6,
+          confidence: 'high',
+          updatedAt: '2026-09-15T00:00:00.000Z',
+        },
+      },
+    }, skills)).toBe('target');
   });
 });
