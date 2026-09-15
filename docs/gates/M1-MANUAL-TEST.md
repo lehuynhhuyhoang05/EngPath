@@ -66,7 +66,7 @@ Ghi `PASS`, `FAIL` hoặc `BLOCKED` và mô tả ngắn. Chụp màn hình nếu
 
 ## Vòng 3
 
-- Build/commit: pending final commit
+- Build/commit: `bd5ccf4`
 - [x] Progress không còn dùng thống kê ba cột và thanh mastery phần trăm gây cảm giác dashboard AI.
 - [x] Kết quả học tập dùng nhãn theo lượng bằng chứng, không cho một câu đúng thành `Khá vững`.
 - [x] Copy học sinh bỏ các thuật ngữ nội bộ như milestone, khung UX hoặc điểm AI.
