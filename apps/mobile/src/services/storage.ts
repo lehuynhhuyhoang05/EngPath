@@ -20,3 +20,10 @@ export async function saveAppState(state: StoredAppState): Promise<void> {
   }
 }
 
+export async function clearAppState(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Reset remains usable in memory if local storage is unavailable.
+  }
+}
