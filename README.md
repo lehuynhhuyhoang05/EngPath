@@ -42,4 +42,4 @@ The pronunciation score is intentionally mocked. The UI states this clearly and 
 
 ## Current milestone
 
-M0 foundation work is active. The learner interview kit starts at [docs/research/M0_INTERVIEW_GUIDE.md](docs/research/M0_INTERVIEW_GUIDE.md), and gate evidence is recorded under `docs/gates/`.
+M0 foundation passed on 2026-09-15 and M1 UX direction is active. The learner research kit starts at [docs/research/M0_INTERVIEW_GUIDE.md](docs/research/M0_INTERVIEW_GUIDE.md), and gate evidence is recorded under `docs/gates/`.

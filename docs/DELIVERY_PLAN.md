@@ -1,7 +1,7 @@
 # EngPath — Kế hoạch phát triển và Quality Gates
 
 Status: Active v1.1  
-Current milestone: M0 — Product evidence và nền repository  
+Current milestone: M1 — UX direction và design foundation  
 Last reviewed: 2026-09-15  
 Đối tượng lập kế hoạch: một developer chính, có người hỗ trợ duyệt nội dung và tuyển beta  
 Nguyên tắc: **không qua cổng chất lượng thì không chuyển milestone**
@@ -34,7 +34,7 @@ Mỗi milestone phải có đủ:
 | Grade-10 exam | Chưa làm | Mới có entry card, chưa có exam flow hoàn chỉnh |
 | Beta readiness | Chưa đạt | Chưa có APK beta, analytics tối thiểu, privacy flow hoặc field test |
 
-Vì vậy milestone hiện tại không được đánh dấu “vertical slice hoàn thành”. M0 đang active; chỉ sau khi [M0 gate](gates/M0-2026-09-15.md) pass mới mở M1 để kiểm chứng UX, rồi mới hoàn thiện M2.
+Prototype hiện tại vẫn chưa được đánh dấu “vertical slice hoàn thành”. [M0 gate](gates/M0-2026-09-15.md) đã pass; M1 hiện active để kiểm chứng UX trước khi hoàn thiện M2.
 
 ## 3. Luật qua cổng chung
 
