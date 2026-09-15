@@ -25,8 +25,9 @@ export function Screen({ children, footer, testID }: PropsWithChildren<{ footer?
 export function Brand() {
   return (
     <View style={styles.brand} accessible accessibilityLabel="EngPath">
-      <View style={styles.brandMark}><Text style={styles.brandLetter}>E</Text></View>
+      <View style={styles.brandMark} />
       <Text style={styles.brandName}>EngPath</Text>
+      <Text style={styles.brandDot}>.</Text>
     </View>
   );
 }
@@ -134,9 +135,9 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
   footer: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: spacing.md, borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: colors.surface },
   brand: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start' },
-  brandMark: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },
-  brandLetter: { color: colors.white, fontSize: 20, fontWeight: '700' },
-  brandName: { marginLeft: spacing.xs, color: colors.ink, fontSize: 18, fontWeight: '700' },
+  brandMark: { width: 4, height: 25, backgroundColor: colors.primary },
+  brandName: { marginLeft: spacing.xs, color: colors.ink, fontSize: 20, fontWeight: '700', letterSpacing: -0.4 },
+  brandDot: { color: colors.accent, fontSize: 22, lineHeight: 25, fontWeight: '700' },
   eyebrow: { ...type.caption, color: colors.primary, textTransform: 'uppercase', letterSpacing: 1.1 },
   button: { minHeight: 52, borderRadius: radii.md, paddingHorizontal: spacing.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1 },
   button_primary: { backgroundColor: colors.primary, borderColor: colors.primary },
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   backText: { ...type.label, color: colors.ink },
   track: { height: 8, borderRadius: radii.round, backgroundColor: colors.line, overflow: 'hidden' },
   fill: { height: 8, borderRadius: radii.round, backgroundColor: colors.primary },
-  pill: { alignSelf: 'flex-start', borderRadius: radii.round, paddingHorizontal: 10, paddingVertical: 5 },
+  pill: { alignSelf: 'flex-start', borderRadius: radii.sm, paddingHorizontal: 8, paddingVertical: 4 },
   pill_neutral: { backgroundColor: colors.surfaceMuted },
   pill_primary: { backgroundColor: colors.primarySoft },
   pill_success: { backgroundColor: colors.successSoft },
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   tabLabel: { fontSize: 11, lineHeight: 15, fontWeight: '500', color: colors.muted },
   tabLabelActive: { color: colors.primary, fontWeight: '700' },
   empty: { paddingVertical: 36, paddingHorizontal: spacing.lg, alignItems: 'center' },
-  emptyIcon: { width: 52, height: 52, borderRadius: 18, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  emptyIcon: { width: 48, height: 48, borderRadius: radii.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   emptyTitle: { ...type.heading, color: colors.ink, marginTop: spacing.md, textAlign: 'center' },
   emptyBody: { ...type.body, color: colors.muted, marginTop: spacing.xs, textAlign: 'center' },
 });

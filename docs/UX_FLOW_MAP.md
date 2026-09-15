@@ -48,7 +48,7 @@ Bottom navigation chỉ xuất hiện sau onboarding và giữ bốn điểm đ�
 ### Thay đổi
 
 - Tách màn hình và component khỏi `App.tsx`.
-- Dùng màu indigo, nền xám xanh nhạt và tối đa ba cấp độ đậm chữ.
+- Dùng xanh lá đậm, vermilion tiết chế, nền giấy trung tính và tối đa ba cấp độ đậm chữ.
 - Dùng bottom navigation bốn tab và SVG icon nội bộ thống nhất.
 - Kết quả chẩn đoán dùng mức học + lượng bằng chứng, không dẫn bằng điểm 0–100.
 - Phát âm có đủ state của luồng nhưng ghi rõ mọi audio/AI hiện là mô phỏng.
@@ -68,7 +68,7 @@ Bottom navigation chỉ xuất hiện sau onboarding và giữ bốn điểm đ�
 
 - `Screen`: vùng cuộn + footer CTA cố định.
 - `Button`, `TextButton`, `BackButton`: control tối thiểu 48 dp.
-- `Pill`, `ProgressBar`, `EmptyState`: feedback không dựa riêng vào màu.
+- `Pill`, `ProgressBar`, `EmptyState`: metadata/state tiết chế, feedback không dựa riêng vào màu.
 - `BottomTabs`: bốn tab có role/selected state.
 - `Icon`: bộ SVG nội bộ, không dùng Unicode làm icon giao diện.
 - Feature cards: mission, skill evidence, lesson feedback, pronunciation state.

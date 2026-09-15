@@ -27,7 +27,7 @@ Mỗi milestone phải có đủ:
 |---|---|---|
 | Product contract | Gần đạt | Tầm nhìn và phạm vi đúng; cần thêm nghiên cứu trực tiếp với học sinh |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
-| Prototype local | M1 candidate | Sáu luồng lõi bấm được với bottom navigation, design foundation và learning evidence thận trọng; đang chờ manual/usability review |
+| Prototype local | M1 iteration 2 | Business flow của sáu luồng lõi đã được owner đánh giá ổn; visual language vòng 1 bị loại vì quá giống AI template và đang được thay bằng hướng editorial/study notebook |
 | Automated tests | Một phần | 10 test Vitest cho diagnostic, presentation logic và seed data; chưa có component/integration/E2E và chưa cấu hình test runner chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |

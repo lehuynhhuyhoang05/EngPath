@@ -99,7 +99,7 @@ export default function App() {
   };
 
   const renderRoute = () => {
-    if (!hydrated) return <View style={styles.loading}><View style={styles.loadingMark}><Text style={styles.loadingLetter}>E</Text></View><Text style={styles.loadingText}>Đang mở lộ trình…</Text></View>;
+    if (!hydrated) return <View style={styles.loading}><View style={styles.loadingBrand}><View style={styles.loadingRule} /><Text style={styles.loadingName}>EngPath</Text><Text style={styles.loadingDot}>.</Text></View><Text style={styles.loadingText}>Đang mở lộ trình…</Text></View>;
     if (route === 'onboarding') return <OnboardingScreen initialProfile={state.profile} onContinue={finishOnboarding} />;
     if (!state.profile) return <OnboardingScreen onContinue={finishOnboarding} />;
     if (route === 'diagnostic-intro') return <DiagnosticIntroScreen grade={state.profile.grade} onStart={() => setRoute('diagnostic')} onBack={() => setRoute('onboarding')} />;
@@ -134,8 +134,10 @@ const styles = StyleSheet.create({
   appFrame: { flex: 1, backgroundColor: colors.canvas, paddingTop: Platform.OS === 'android' ? NativeStatusBar.currentHeight : 0 },
   mainShell: { flex: 1 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.canvas },
-  loadingMark: { width: 58, height: 58, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },
-  loadingLetter: { color: colors.white, fontSize: 30, fontWeight: '700' },
+  loadingBrand: { flexDirection: 'row', alignItems: 'center' },
+  loadingRule: { width: 4, height: 28, backgroundColor: colors.primary, marginRight: 8 },
+  loadingName: { color: colors.ink, fontSize: 22, fontWeight: '700', letterSpacing: -0.4 },
+  loadingDot: { color: colors.accent, fontSize: 24, lineHeight: 28, fontWeight: '700' },
   loadingText: { ...type.bodyStrong, color: colors.muted, marginTop: 14 },
   webStage: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16, backgroundColor: '#DDE5F1' },
   phone: { width: '100%', maxWidth: 420, height: '100%', maxHeight: 860, borderWidth: 8, borderColor: '#121826', borderRadius: 38, overflow: 'hidden', backgroundColor: colors.canvas },

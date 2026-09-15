@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GOALS, GRADES } from '../data/seed';
 import type { GoalId, Grade, LearnerProfile } from '../domain/models';
-import { Brand, Button, Icon, Pill, Screen } from '../ui/components';
+import { Brand, Button, Icon, Screen } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
 
 export function OnboardingScreen({ initialProfile, onContinue }: { initialProfile?: LearnerProfile; onContinue: (profile: LearnerProfile) => void }) {
@@ -22,7 +22,7 @@ export function OnboardingScreen({ initialProfile, onContinue }: { initialProfil
     >
       <Brand />
       <View style={styles.hero}>
-        <Pill tone="primary">Thiết kế riêng cho lớp 6–9</Pill>
+        <View style={styles.heroMeta}><Text style={styles.heroLabel}>LỘ TRÌNH TỰ HỌC · LỚP 6–9</Text><View style={styles.heroRule} /></View>
         <Text style={styles.title}>Hôm nay em muốn tiến bộ điều gì?</Text>
         <Text style={styles.body}>Chọn lớp và mục tiêu. EngPath sẽ đề xuất một đường học ngắn, không cần tạo tài khoản.</Text>
       </View>
@@ -60,7 +60,8 @@ export function OnboardingScreen({ initialProfile, onContinue }: { initialProfil
               onPress={() => setGoalId(goal.id)}
               style={({ pressed }) => [styles.goal, selected && styles.goalSelected, pressed && styles.pressed]}
             >
-              <View style={[styles.goalIcon, selected && styles.goalIconSelected]}>
+              <View style={[styles.goalMarker, selected && styles.goalMarkerSelected]} />
+              <View style={styles.goalIcon}>
                 <Icon name={goal.id === 'pronunciation' ? 'mic' : goal.id === 'exam-10' ? 'flag' : goal.id === 'foundation-repair' ? 'rotate' : 'book'} color={selected ? colors.primary : colors.muted} />
               </View>
               <View style={styles.goalCopy}>
@@ -104,21 +105,25 @@ function Fact({ icon, text }: { icon: 'clock' | 'target' | 'lock'; text: string 
 }
 
 const styles = StyleSheet.create({
-  hero: { marginTop: spacing.xxl, marginBottom: spacing.xl },
-  title: { ...type.display, color: colors.ink, marginTop: spacing.md },
+  hero: { marginTop: 42, marginBottom: spacing.xl },
+  heroMeta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  heroLabel: { ...type.caption, color: colors.primary, letterSpacing: 0.8 },
+  heroRule: { flex: 1, height: 1, backgroundColor: colors.line },
+  title: { ...type.display, color: colors.ink, marginTop: spacing.sm, letterSpacing: -0.7 },
   body: { ...type.body, color: colors.muted, marginTop: spacing.sm },
   sectionTitle: { ...type.heading, color: colors.ink, marginBottom: spacing.sm },
   gradeRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.xl },
-  grade: { flex: 1, minHeight: 72, borderWidth: 1, borderColor: colors.line, borderRadius: radii.md, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface },
-  gradeSelected: { borderColor: colors.primary, backgroundColor: colors.primary },
+  grade: { flex: 1, minHeight: 68, borderWidth: 1, borderColor: colors.line, borderRadius: radii.md, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface },
+  gradeSelected: { borderColor: colors.primary, borderBottomWidth: 4, backgroundColor: colors.surface },
   gradePrefix: { ...type.caption, color: colors.muted, fontSize: 10 },
   gradeNumber: { color: colors.ink, fontSize: 25, lineHeight: 30, fontWeight: '700' },
-  selectedText: { color: colors.white },
-  goalList: { gap: spacing.sm },
-  goal: { minHeight: 88, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: colors.line, borderRadius: radii.lg, padding: spacing.sm, backgroundColor: colors.surface },
-  goalSelected: { borderColor: colors.primary, backgroundColor: colors.primarySoft },
-  goalIcon: { width: 48, height: 48, borderRadius: radii.md, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceMuted },
-  goalIconSelected: { backgroundColor: colors.surface },
+  selectedText: { color: colors.primary },
+  goalList: { borderTopWidth: 1, borderTopColor: colors.line },
+  goal: { minHeight: 84, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: colors.line, paddingVertical: spacing.sm, backgroundColor: 'transparent' },
+  goalSelected: { backgroundColor: colors.surface },
+  goalMarker: { width: 3, height: 44, backgroundColor: 'transparent', marginRight: spacing.xs },
+  goalMarkerSelected: { backgroundColor: colors.accent },
+  goalIcon: { width: 40, height: 48, alignItems: 'center', justifyContent: 'center' },
   goalCopy: { flex: 1, marginHorizontal: spacing.sm },
   goalTitle: { ...type.bodyStrong, color: colors.ink },
   goalBody: { ...type.caption, color: colors.muted, marginTop: 2 },
@@ -128,13 +133,13 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.72 },
   inlineBack: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' },
   inlineBackText: { ...type.label, color: colors.ink },
-  introIcon: { width: 68, height: 68, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft, marginTop: spacing.lg },
+  introIcon: { width: 52, height: 52, alignItems: 'flex-start', justifyContent: 'center', marginTop: spacing.lg },
   introTitle: { ...type.display, color: colors.ink, marginTop: spacing.lg },
   introBody: { ...type.body, color: colors.muted, marginTop: spacing.sm },
   factList: { marginTop: spacing.xl, gap: spacing.md },
   fact: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   factText: { ...type.bodyStrong, color: colors.ink, flex: 1 },
-  infoBox: { borderRadius: radii.lg, padding: spacing.md, backgroundColor: colors.warningSoft, marginTop: spacing.xl },
+  infoBox: { borderLeftWidth: 3, borderLeftColor: colors.warning, padding: spacing.md, backgroundColor: colors.warningSoft, marginTop: spacing.xl },
   infoTitle: { ...type.label, color: colors.warning },
   infoBody: { ...type.caption, color: colors.inkSoft, marginTop: spacing.xs },
 });

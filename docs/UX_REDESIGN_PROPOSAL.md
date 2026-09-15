@@ -1,6 +1,6 @@
 # EngPath — Đề xuất thiết kế lại UI/UX
 
-Status: Proposed v1.0  
+Status: Flow accepted; visual direction superseded by `M1_VISUAL_LANGUAGE.md` iteration 2
 Phạm vi: Android-first, học sinh Việt Nam lớp 6–9  
 Quyết định đề xuất: thiết kế lại theo hướng **Study Coach**, chưa mở rộng thêm tính năng trước khi luồng lõi được kiểm chứng
 
@@ -66,12 +66,12 @@ Không dùng phong cách quá trẻ con như app tiểu học, cũng không bi�
 
 ### Hệ thống hình ảnh ban đầu
 
-- Nền chính: trắng hoặc xám xanh rất nhạt, hạn chế nền kem phủ toàn app.
-- Màu chính: xanh cobalt/indigo để tạo cảm giác tin cậy.
-- Màu hỗ trợ: mint cho tiến bộ, amber cho cần chú ý, đỏ chỉ dùng cho lỗi thật sự.
+- Nền chính: trắng ngà trung tính, tạo cảm giác mặt giấy nhưng không ngả kem nặng.
+- Màu chính: xanh lá đậm cho chức năng; vermilion dùng tiết chế như dấu bút/lề nhấn.
+- Màu hỗ trợ: xanh dịu cho tiến bộ, amber cho cần chú ý, đỏ chỉ dùng cho lỗi thật sự.
 - Typography: tối đa ba mức độ đậm; nội dung dài dùng regular/medium, tiêu đề dùng semibold/bold.
 - Grid spacing: bội số 4; khoảng cách màn hình ưu tiên 16/20/24.
-- Bo góc: 12–16 cho control, 20–24 chỉ cho hero card.
+- Bo góc: 4–8 cho control, 12–16 chỉ cho state container hiếm; ưu tiên đường kẻ và lề nhấn hơn card.
 - Touch target: tối thiểu 48 × 48 dp.
 - Màu chữ thường đạt contrast 4.5:1; trạng thái đúng/sai luôn có icon hoặc text, không dựa riêng vào màu.
 
@@ -196,4 +196,3 @@ Không chuyển sang xây backend hoặc thêm nhiều nội dung cho đến khi
 9. Chạy component, accessibility, E2E và usability gate.
 
 Không cần làm mọi màn hình hoàn mỹ cùng lúc. Cần làm hoàn chỉnh một vertical slice bằng design system thật rồi mới nhân rộng.
-

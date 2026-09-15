@@ -50,7 +50,16 @@ Ghi `PASS`, `FAIL` hoặc `BLOCKED` và mô tả ngắn. Chụp màn hình nếu
 ## Kết quả
 
 - P0/P1:
-- P2:
-- Điểm khó hiểu nhất:
-- Màn hình cần chỉnh nhất:
+- P2: Vòng 1 có visual language quá giống template AI; quá nhiều card bo tròn, pill và icon box.
+- Điểm khó hiểu nhất: Không ghi nhận vấn đề business flow trong phản hồi vòng 1.
+- Màn hình cần chỉnh nhất: Toàn bộ visual system, không phải một màn riêng lẻ.
+- Quyết định owner: **FIX AND RETEST** — functional/business flow có vẻ ổn; visual direction chưa được duyệt.
+
+## Vòng 2
+
+- Build/commit:
+- [ ] Visual mới có cảm giác được thiết kế có chủ đích, không còn kiểu AI dashboard.
+- [ ] Ít card/pill hơn nhưng thứ bậc và vùng bấm vẫn rõ.
+- [ ] Màu xanh lá đậm + vermilion không gây cảm giác quá trẻ con hoặc quá doanh nghiệp.
+- [ ] Onboarding, Hôm nay, Lesson và Phát âm cùng một ngôn ngữ hình ảnh.
 - Quyết định owner: PASS / FIX AND RETEST
