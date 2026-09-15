@@ -1,6 +1,7 @@
 # M1 UI self-audit — iteration 3
 
 Date: 2026-09-15  
+Build/commit: `b0e5987`  
 Viewport: local web phone stage, 420 × 860  
 Screens inspected from running code: onboarding, Today, lesson, pronunciation, progress
 
