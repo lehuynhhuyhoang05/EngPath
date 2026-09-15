@@ -57,7 +57,7 @@ Ghi `PASS`, `FAIL` hoặc `BLOCKED` và mô tả ngắn. Chụp màn hình nếu
 
 ## Vòng 2
 
-- Build/commit:
+- Build/commit: `6276e4f`
 - [ ] Visual mới có cảm giác được thiết kế có chủ đích, không còn kiểu AI dashboard.
 - [ ] Ít card/pill hơn nhưng thứ bậc và vùng bấm vẫn rõ.
 - [ ] Màu xanh lá đậm + vermilion không gây cảm giác quá trẻ con hoặc quá doanh nghiệp.
