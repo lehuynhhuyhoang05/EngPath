@@ -1,6 +1,6 @@
 # EngPath — M1 visual language, iteration 2
 
-Status: Candidate for owner review  
+Status: Implemented iteration 3; internal self-audit passed
 Direction: **Study notebook / editorial**, not generic AI dashboard
 
 ## Why iteration 1 failed visually
@@ -36,6 +36,10 @@ EngPath should feel like a thoughtfully typeset study notebook:
 6. Avoid a dark hero as the default hierarchy shortcut; the main action should win through type, position and one accent rule.
 7. Keep one strong accent moment per screen.
 8. Preserve 48 dp controls, contrast, text scaling and the sticky primary action.
+
+## Iteration 3 correction
+
+The second iteration still looked like a templated analytics screen on Progress. The final internal pass therefore removes equal statistic boxes and percentage-like mastery bars, uses numbered editorial rows, adds a useful next action, and bans abstract/project-internal copy from student screens. See `docs/gates/M1-SELF-AUDIT.md`.
 
 ## Product decision
 

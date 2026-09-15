@@ -79,43 +79,44 @@ export function DiagnosticResultScreen({ result, onStart }: { result: Diagnostic
   const ordered = sortSkillsForReview(result.skillScores);
   const priority = ordered[0];
   const observations = result.skillScores.reduce((sum, skill) => sum + skill.total, 0);
+  const repeatedSkills = result.skillScores.filter((skill) => skill.total >= 2).length;
 
   return (
     <Screen testID="diagnostic-result" footer={<Button label="Bắt đầu nhiệm vụ đầu tiên" onPress={onStart} />}>
-      <View style={styles.resultIcon}><Icon name="target" size={32} color={colors.primary} /></View>
-      <Text style={styles.resultTitle}>Em nên bắt đầu từ {SKILLS[priority.skillId].title}</Text>
-      <Text style={styles.resultBody}>Đây là lộ trình tạm dựa trên {observations} câu vừa quan sát. Kết quả sẽ được cập nhật sau mỗi buổi học.</Text>
+      <Text style={styles.resultIndex}>01 / ĐIỂM BẮT ĐẦU</Text>
+      <Text style={styles.resultTitle}>Bài đầu tiên: {SKILLS[priority.skillId].title}</Text>
+      <Text style={styles.resultBody}>Em vừa làm {observations} câu ở {result.skillScores.length} phần. Mới có {repeatedSkills} phần được hỏi hơn một lần, nên đây vẫn là gợi ý ban đầu.</Text>
 
       <View style={styles.priorityCard}>
         <View style={styles.priorityTop}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.cardLabel}>ƯU TIÊN ĐẦU TIÊN</Text>
+            <Text style={styles.cardLabel}>HỌC TRƯỚC</Text>
             <Text style={styles.priorityTitle}>{SKILLS[priority.skillId].title}</Text>
           </View>
-          <Pill tone="warning">{learningBand(priority.score)}</Pill>
+          <Text style={styles.priorityBand}>{learningBand(priority.score, priority.total)}</Text>
         </View>
         <Text style={styles.priorityBody}>Bắt đầu bằng một bài giải thích ngắn, sau đó luyện lại với ví dụ gần giống.</Text>
       </View>
 
       <View style={styles.evidenceHeader}>
-        <Text style={styles.sectionTitle}>Những gì EngPath đã quan sát</Text>
-        <Pill tone="neutral">Tin cậy: {evidenceConfidence(observations)}</Pill>
+        <Text style={styles.sectionTitle}>Kết quả từng phần</Text>
+        <Text style={styles.evidenceIntro}>Mỗi phần cần thêm vài lượt làm trước khi có thể kết luận chắc chắn.</Text>
       </View>
       <View style={styles.skillList}>
         {ordered.slice(0, 3).map((skill) => (
           <View key={skill.skillId} style={styles.skillRow}>
             <View style={styles.skillCopy}>
               <Text style={styles.skillTitle}>{SKILLS[skill.skillId].title}</Text>
-              <Text style={styles.skillEvidence}>{skill.correct}/{skill.total} câu quan sát · Tin cậy {evidenceConfidence(skill.total).toLowerCase()}</Text>
+              <Text style={styles.skillEvidence}>Đúng {skill.correct}/{skill.total} câu · {evidenceConfidence(skill.total)}</Text>
             </View>
-            <Text style={[styles.band, skill.score < 50 ? styles.bandWarning : styles.bandSuccess]}>{learningBand(skill.score)}</Text>
+            <Text style={[styles.band, skill.total < 2 ? styles.bandNeutral : skill.score < 50 ? styles.bandWarning : styles.bandSuccess]}>{learningBand(skill.score, skill.total)}</Text>
           </View>
         ))}
       </View>
 
       <View style={styles.note}>
         <Icon name="alert" size={20} color={colors.warning} />
-        <Text style={styles.noteText}>Một câu đúng chưa có nghĩa là đã thành thạo. EngPath cần thêm lần luyện để tăng độ tin cậy.</Text>
+        <Text style={styles.noteText}>Một câu đúng chưa có nghĩa là đã vững. Kết quả này sẽ thay đổi khi em học thêm.</Text>
       </View>
     </Screen>
   );
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   unknownSelected: { borderLeftWidth: 3, borderLeftColor: colors.warning, backgroundColor: colors.warningSoft },
   unknownText: { ...type.label, color: colors.inkSoft },
   pressed: { opacity: 0.72 },
-  resultIcon: { width: 48, height: 48, alignItems: 'flex-start', justifyContent: 'center' },
+  resultIndex: { ...type.caption, color: colors.accent, letterSpacing: 0.8, marginTop: spacing.sm },
   resultTitle: { ...type.display, color: colors.ink, marginTop: spacing.lg },
   resultBody: { ...type.body, color: colors.muted, marginTop: spacing.sm },
   priorityCard: { borderLeftWidth: 3, borderLeftColor: colors.accent, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line, padding: spacing.lg, backgroundColor: colors.surface, marginTop: spacing.xl },
@@ -147,14 +148,17 @@ const styles = StyleSheet.create({
   cardLabel: { ...type.caption, color: colors.accent, letterSpacing: 0.8 },
   priorityTitle: { ...type.title, color: colors.ink, marginTop: spacing.xs },
   priorityBody: { ...type.body, color: colors.inkSoft, marginTop: spacing.md },
+  priorityBand: { ...type.caption, color: colors.warning, maxWidth: 92, textAlign: 'right' },
   evidenceHeader: { marginTop: spacing.xl, gap: spacing.sm, alignItems: 'flex-start' },
   sectionTitle: { ...type.heading, color: colors.ink },
+  evidenceIntro: { ...type.caption, color: colors.muted },
   skillList: { marginTop: spacing.sm, borderTopWidth: 1, borderColor: colors.line },
   skillRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', padding: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.line, gap: spacing.sm },
   skillCopy: { flex: 1 },
   skillTitle: { ...type.bodyStrong, color: colors.ink },
   skillEvidence: { ...type.caption, color: colors.muted, marginTop: 3 },
   band: { ...type.caption, textAlign: 'right', maxWidth: 95 },
+  bandNeutral: { color: colors.muted },
   bandWarning: { color: colors.warning },
   bandSuccess: { color: colors.success },
   note: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingVertical: spacing.md, borderTopWidth: 1, borderTopColor: colors.warning, marginTop: spacing.md },

@@ -22,8 +22,7 @@ export function LessonScreen({ lesson, onBack, onComplete }: { lesson: Lesson; o
       <ProgressBar value={checked ? 0.75 : 0.45} label={checked ? 'Bước giải thích' : 'Bước thử'} />
 
       <View style={styles.ruleCard}>
-        <View style={styles.ruleIcon}><Icon name="book" color={colors.primary} /></View>
-        <Text style={styles.ruleLabel}>QUY TẮC NGẮN</Text>
+        <View style={styles.ruleHeading}><Text style={styles.ruleIndex}>01</Text><Text style={styles.ruleLabel}>QUY TẮC NGẮN</Text></View>
         <Text style={styles.ruleText}>{lesson.explanationVi}</Text>
         <View style={styles.example}><Text style={styles.exampleLabel}>VÍ DỤ</Text><Text style={styles.exampleText}>{lesson.example}</Text><Text style={styles.exampleVi}>{lesson.exampleVi}</Text></View>
       </View>
@@ -61,7 +60,7 @@ export function LessonScreen({ lesson, onBack, onComplete }: { lesson: Lesson; o
         </View>
       ) : null}
 
-      {!reported ? <TextButton label="Báo nội dung có vấn đề" onPress={() => setReported(true)} /> : <Text accessibilityLiveRegion="polite" style={styles.reported}>Đã ghi nhận trong bản mẫu. Luồng gửi báo cáo thật sẽ được nối ở milestone sau.</Text>}
+      {!reported ? <TextButton label="Báo nội dung có vấn đề" onPress={() => setReported(true)} /> : <Text accessibilityLiveRegion="polite" style={styles.reported}>Đã ghi nhận. Tính năng gửi báo cáo cho đội nội dung sẽ được thêm sau.</Text>}
     </Screen>
   );
 }
@@ -107,8 +106,8 @@ export function PronunciationScreen({ prompt, bestScore, onBack, onScore, onComp
     <Screen testID="pronunciation-screen" footer={footer}>
       <View style={styles.lessonTop}><BackButton onPress={onBack} /><Pill tone="warning">Mô phỏng UX</Pill></View>
       <Text style={styles.stepLabel}>PHÁT ÂM · ÂM /θ/</Text>
-      <Text style={styles.title}>Nghe, nói và sửa một điểm mỗi lần</Text>
-      <Text style={styles.lead}>Bản M1 không truy cập micro, không thu và không gửi âm thanh.</Text>
+      <Text style={styles.title}>Luyện âm /θ/ trong một câu</Text>
+      <Text style={styles.lead}>Đây là bản mô phỏng: app chưa dùng micro, chưa thu và chưa gửi âm thanh.</Text>
 
       <View style={styles.speechCard}>
         <Pressable accessibilityRole="button" accessibilityLabel="Nghe câu mẫu mô phỏng" onPress={() => setSamplePlayed(true)} style={({ pressed }) => [styles.listenButton, pressed && styles.pressed]}>
@@ -151,8 +150,9 @@ const styles = StyleSheet.create({
   title: { ...type.title, color: colors.ink, marginTop: spacing.xs },
   lead: { ...type.body, color: colors.muted, marginTop: spacing.xs, marginBottom: spacing.lg },
   ruleCard: { borderLeftWidth: 3, borderLeftColor: colors.accent, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line, padding: spacing.lg, backgroundColor: colors.surface, marginVertical: spacing.xl },
-  ruleIcon: { width: 40, height: 40, alignItems: 'flex-start', justifyContent: 'center' },
-  ruleLabel: { ...type.caption, color: colors.accent, marginTop: spacing.sm, letterSpacing: 0.8 },
+  ruleHeading: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
+  ruleIndex: { color: colors.lineStrong, fontSize: 27, lineHeight: 32, fontWeight: '500' },
+  ruleLabel: { ...type.caption, color: colors.accent, letterSpacing: 0.8 },
   ruleText: { ...type.bodyStrong, color: colors.ink, marginTop: spacing.xs },
   example: { borderLeftWidth: 2, borderLeftColor: colors.primary, paddingLeft: spacing.md, paddingVertical: spacing.xs, marginTop: spacing.lg },
   exampleLabel: { ...type.caption, color: colors.primary },
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   speechText: { fontSize: 25, lineHeight: 34, fontWeight: '700', color: colors.ink, textAlign: 'center', marginTop: spacing.lg },
   speechLocale: { ...type.caption, color: colors.muted, marginTop: spacing.xs },
   waveform: { height: 60, flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: spacing.md },
-  wave: { width: 4, borderRadius: 3, backgroundColor: '#91A6F8' },
+  wave: { width: 4, borderRadius: 2, backgroundColor: colors.primary },
   tipCard: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, borderLeftWidth: 3, borderLeftColor: colors.warning, padding: spacing.md, backgroundColor: colors.warningSoft, marginTop: spacing.md },
   tipIcon: { width: 36, height: 44, alignItems: 'flex-start', justifyContent: 'center' },
   tipTitle: { ...type.label, color: colors.warning },

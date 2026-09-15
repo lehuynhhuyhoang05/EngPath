@@ -94,7 +94,7 @@ export default function App() {
     const openProfile = () => setRoute('profile');
     if (activeTab === 'learn') return <LearnScreen state={state} onLesson={(lesson) => { setSelectedLessonId(lesson.id); setRoute('lesson'); }} onProfile={openProfile} />;
     if (activeTab === 'practice') return <PracticeScreen profile={state.profile} onPronunciation={() => setRoute('pronunciation')} onExam={() => setRoute('exam')} onProfile={openProfile} />;
-    if (activeTab === 'progress') return <ProgressScreen state={state} onProfile={openProfile} />;
+    if (activeTab === 'progress') return <ProgressScreen state={state} onProfile={openProfile} onLesson={openPriorityLesson} />;
     return <TodayScreen state={state} onLesson={openPriorityLesson} onPronunciation={() => setRoute('pronunciation')} onExam={() => setRoute('exam')} onProfile={openProfile} />;
   };
 

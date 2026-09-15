@@ -2,15 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { evidenceConfidence, learningBand, sortSkillsForReview } from './diagnosticPresentation';
 
 describe('diagnostic presentation', () => {
-  it('uses learning bands instead of exposing false precision', () => {
-    expect(learningBand(0)).toBe('Cần củng cố');
-    expect(learningBand(50)).toBe('Đang hình thành');
-    expect(learningBand(80)).toBe('Khá vững');
+  it('does not infer mastery from a single observation', () => {
+    expect(learningBand(0, 1)).toBe('Đang quan sát');
+    expect(learningBand(100, 1)).toBe('Đang quan sát');
+    expect(learningBand(100, 2)).toBe('Có tín hiệu tốt');
+    expect(learningBand(80, 4)).toBe('Khá vững');
   });
 
   it('keeps confidence low when evidence is sparse', () => {
-    expect(evidenceConfidence(1)).toBe('Thấp');
-    expect(evidenceConfidence(2)).toBe('Đang tăng');
+    expect(evidenceConfidence(1)).toBe('Cần thêm lượt làm');
+    expect(evidenceConfidence(2)).toBe('Đang rõ dần');
     expect(evidenceConfidence(4)).toBe('Đủ để định hướng');
   });
 
