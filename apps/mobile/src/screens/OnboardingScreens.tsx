@@ -7,7 +7,7 @@ import { colors, radii, spacing, type } from '../ui/theme';
 
 export function OnboardingScreen({ initialProfile, onContinue }: { initialProfile?: LearnerProfile; onContinue: (profile: LearnerProfile) => void }) {
   const [grade, setGrade] = useState<Grade>(initialProfile?.grade ?? 9);
-  const [goalId, setGoalId] = useState<GoalId>(initialProfile?.goalId ?? 'exam-10');
+  const [goalId, setGoalId] = useState<GoalId>(initialProfile?.goalId ?? 'school-support');
   const availableGoals = useMemo(() => GOALS.filter((goal) => goal.id !== 'exam-10' || grade === 9), [grade]);
 
   const selectGrade = (nextGrade: Grade) => {
@@ -77,16 +77,16 @@ export function OnboardingScreen({ initialProfile, onContinue }: { initialProfil
   );
 }
 
-export function DiagnosticIntroScreen({ grade, onStart, onBack }: { grade: Grade; onStart: () => void; onBack: () => void }) {
+export function DiagnosticIntroScreen({ grade, hasDraft = false, onStart, onBack }: { grade: Grade; hasDraft?: boolean; onStart: () => void; onBack: () => void }) {
   return (
-    <Screen footer={<Button label="Bắt đầu chẩn đoán" onPress={onStart} />}>
+    <Screen footer={<Button label={hasDraft ? 'Tiếp tục chẩn đoán' : 'Bắt đầu chẩn đoán'} onPress={onStart} />}>
       <Pressable accessibilityRole="button" accessibilityLabel="Quay lại chọn mục tiêu" onPress={onBack} style={styles.inlineBack}>
         <Icon name="arrow-left" size={20} color={colors.ink} />
         <Text style={styles.inlineBackText}>Chọn lại</Text>
       </Pressable>
       <View style={styles.introIcon}><Icon name="target" size={34} color={colors.primary} /></View>
       <Text style={styles.introTitle}>Tìm điểm bắt đầu phù hợp cho lớp {grade}</Text>
-      <Text style={styles.introBody}>Khoảng 3–5 phút, mỗi màn hình một câu. Nếu chưa chắc, em có thể chọn “Em chưa biết” thay vì đoán.</Text>
+      <Text style={styles.introBody}>{hasDraft ? 'EngPath đã giữ lại các câu em chọn trước đó. Tiếp tục vài phút nữa để có định hướng đầu tiên.' : 'Khoảng 3–5 phút, mỗi màn hình một câu. Nếu chưa chắc, em có thể chọn “Em chưa biết” thay vì đoán.'}</Text>
       <View style={styles.factList}>
         <Fact icon="clock" text="Tối đa 9 câu ngắn" />
         <Fact icon="target" text="Không tính điểm hay xếp hạng" />

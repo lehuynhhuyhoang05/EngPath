@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { evidenceConfidence, learningBand, sortSkillsForReview } from '../domain/diagnosticPresentation';
 import type { ChoiceQuestion, DiagnosticResult } from '../domain/models';
@@ -6,16 +6,24 @@ import { SKILLS } from '../data/seed';
 import { BackButton, Button, Icon, Pill, ProgressBar, Screen } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
 
-export function DiagnosticScreen({ questions, onComplete, onExit }: {
+export function DiagnosticScreen({ questions, initialAnswers, initialIndex, onProgress, onComplete, onExit }: {
   questions: ChoiceQuestion[];
+  initialAnswers?: Record<string, number>;
+  initialIndex?: number;
+  onProgress?: (answers: Record<string, number>, currentIndex: number) => void;
   onComplete: (answers: Record<string, number>) => void;
   onExit: () => void;
 }) {
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const safeInitialIndex = useMemo(() => Math.min(Math.max(initialIndex ?? 0, 0), Math.max(questions.length - 1, 0)), [initialIndex, questions.length]);
+  const [index, setIndex] = useState(safeInitialIndex);
+  const [answers, setAnswers] = useState<Record<string, number>>(initialAnswers ?? {});
   const question = questions[index];
   const selected = answers[question.id];
   const hasAnswer = selected !== undefined;
+
+  useEffect(() => {
+    onProgress?.(answers, index);
+  }, [answers, index, onProgress]);
 
   const continueFlow = () => {
     if (!hasAnswer) return;

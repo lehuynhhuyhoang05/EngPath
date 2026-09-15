@@ -63,3 +63,13 @@ Ghi `PASS`, `FAIL` hoặc `BLOCKED` và mô tả ngắn. Chụp màn hình nếu
 - [ ] Màu xanh lá đậm + vermilion không gây cảm giác quá trẻ con hoặc quá doanh nghiệp.
 - [ ] Onboarding, Hôm nay, Lesson và Phát âm cùng một ngôn ngữ hình ảnh.
 - Quyết định owner: PASS / FIX AND RETEST
+
+## Vòng 3
+
+- Build/commit: pending final commit
+- [x] Progress không còn dùng thống kê ba cột và thanh mastery phần trăm gây cảm giác dashboard AI.
+- [x] Kết quả học tập dùng nhãn theo lượng bằng chứng, không cho một câu đúng thành `Khá vững`.
+- [x] Copy học sinh bỏ các thuật ngữ nội bộ như milestone, khung UX hoặc điểm AI.
+- [x] Onboarding không mặc định ép mục tiêu thi vào 10; thi vào 10 vẫn hiện đúng cho lớp 9.
+- [x] Diagnostic giữ lại bản làm dở khi thoát/restart.
+- Quyết định M1: **PASS FOR M1** — đủ đóng prototype/design/flow gate và mở M2; Android device/TalkBack/font-scale thật chuyển sang M2.

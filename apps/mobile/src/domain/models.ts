@@ -83,8 +83,15 @@ export interface DiagnosticResult {
   completedAt: string;
 }
 
+export interface DiagnosticDraft {
+  grade: Grade;
+  answers: Record<string, number>;
+  currentIndex: number;
+}
+
 export interface StoredAppState {
   profile?: LearnerProfile;
+  diagnosticDraft?: DiagnosticDraft;
   diagnostic?: DiagnosticResult;
   completedLessonIds: string[];
   completedSessions: number;

@@ -1,6 +1,6 @@
 # EngPath — Đề xuất thiết kế lại UI/UX
 
-Status: Flow accepted; visual direction superseded by `M1_VISUAL_LANGUAGE.md` iteration 2
+Status: Flow accepted; visual direction superseded by `M1_VISUAL_LANGUAGE.md` iteration 3; M1 gate criteria superseded by `DELIVERY_PLAN.md` v1.2
 Phạm vi: Android-first, học sinh Việt Nam lớp 6–9  
 Quyết định đề xuất: thiết kế lại theo hướng **Study Coach**, chưa mở rộng thêm tính năng trước khi luồng lõi được kiểm chứng
 
@@ -174,14 +174,16 @@ Phát âm: âm /θ/                        3 phút
 Không chuyển sang xây backend hoặc thêm nhiều nội dung cho đến khi đạt đủ:
 
 - Có prototype bấm được cho 6 luồng: onboarding, chẩn đoán, kết quả, bài học, phát âm và trang Hôm nay.
-- Ít nhất 5 học sinh lớp 6–9 thử bản prototype; tối thiểu 4/5 tự hoàn thành ba tác vụ lõi mà không được hướng dẫn.
-- Mỗi học sinh hiểu “hôm nay nên học gì” trong tối đa 10 giây ở trang Hôm nay.
-- Người thử phân biệt được điểm mô phỏng, mức ước lượng và kết quả đã có đủ bằng chứng.
+- Owner manual review xác nhận ba tác vụ lõi có thể tự hoàn thành ở mức prototype: chọn mục tiêu, làm chẩn đoán và bắt đầu nhiệm vụ đầu tiên.
+- Trang Hôm nay cho thấy bài cần học tiếp trong khoảng 10 giây khi review bằng web phone frame.
+- Kết quả chẩn đoán phân biệt được điểm mô phỏng, mức ước lượng và kết quả đã có đủ bằng chứng.
 - Không còn CTA chính bị khuất ở viewport Android nhỏ mục tiêu.
 - Tất cả control tương tác đạt tối thiểu 48 × 48 dp và có accessibility label phù hợp.
-- Text thường đạt contrast 4.5:1; UI vẫn hiểu được khi phóng chữ lên 200% ở các luồng lõi.
+- Text thường đạt contrast 4.5:1; UI vẫn hiểu được khi phóng chữ lên 200% ở web phone frame, còn Android thật xác nhận ở M2.
 - Có thiết kế được duyệt cho loading, empty, error, offline và microphone denied.
-- Không còn lỗi P0/P1 sau usability test; P2 có owner và mốc xử lý.
+- Không còn lỗi P0/P1 sau owner review và internal self-audit; P2 có owner và mốc xử lý.
+
+Ghi chú: thử với học sinh thật không bỏ, nhưng không còn chặn M1. Vòng learner usability sẽ chạy sau khi M2 có local vertical slice đủ ổn để không làm nhiễu kết quả bằng lỗi prototype.
 
 ## 8. Trình tự triển khai UI
 

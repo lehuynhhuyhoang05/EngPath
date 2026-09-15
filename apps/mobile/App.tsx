@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StatusBar as NativeStatusBar, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { diagnosticQuestionsForGrade, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT } from './src/data/seed';
@@ -29,7 +29,7 @@ export default function App() {
     loadAppState().then((stored) => {
       if (stored) {
         setState({ ...EMPTY_STATE, ...stored });
-        setRoute(stored.profile ? (stored.diagnostic ? 'main' : 'diagnostic-intro') : 'onboarding');
+        setRoute(stored.profile ? (stored.diagnostic ? 'main' : stored.diagnosticDraft ? 'diagnostic' : 'diagnostic-intro') : 'onboarding');
       }
       setHydrated(true);
     });
@@ -55,15 +55,30 @@ export default function App() {
   };
 
   const finishOnboarding = (profile: LearnerProfile) => {
-    setState((current) => ({ ...current, profile, diagnostic: current.profile?.grade === profile.grade ? current.diagnostic : undefined }));
+    setState((current) => ({
+      ...current,
+      profile,
+      diagnostic: current.profile?.grade === profile.grade ? current.diagnostic : undefined,
+      diagnosticDraft: current.profile?.grade === profile.grade ? current.diagnosticDraft : undefined,
+    }));
     setRoute('diagnostic-intro');
   };
 
   const completeDiagnostic = (answers: Record<string, number>) => {
     const diagnostic = scoreDiagnostic(questions, answers);
-    setState((current) => ({ ...current, diagnostic }));
+    setState((current) => ({ ...current, diagnostic, diagnosticDraft: undefined }));
     setRoute('result');
   };
+
+  const saveDiagnosticDraft = useCallback((answers: Record<string, number>, currentIndex: number) => {
+    setState((current) => {
+      if (!current.profile) return current;
+      const currentDraft = current.diagnosticDraft;
+      const sameAnswers = JSON.stringify(currentDraft?.answers ?? {}) === JSON.stringify(answers);
+      if (currentDraft?.grade === current.profile.grade && currentDraft.currentIndex === currentIndex && sameAnswers) return current;
+      return { ...current, diagnosticDraft: { grade: current.profile.grade, answers, currentIndex } };
+    });
+  }, []);
 
   const completeLesson = () => {
     setState((current) => ({
@@ -102,8 +117,8 @@ export default function App() {
     if (!hydrated) return <View style={styles.loading}><View style={styles.loadingBrand}><View style={styles.loadingRule} /><Text style={styles.loadingName}>EngPath</Text><Text style={styles.loadingDot}>.</Text></View><Text style={styles.loadingText}>Đang mở lộ trình…</Text></View>;
     if (route === 'onboarding') return <OnboardingScreen initialProfile={state.profile} onContinue={finishOnboarding} />;
     if (!state.profile) return <OnboardingScreen onContinue={finishOnboarding} />;
-    if (route === 'diagnostic-intro') return <DiagnosticIntroScreen grade={state.profile.grade} onStart={() => setRoute('diagnostic')} onBack={() => setRoute('onboarding')} />;
-    if (route === 'diagnostic') return <DiagnosticScreen questions={questions} onComplete={completeDiagnostic} onExit={() => setRoute(state.diagnostic ? 'main' : 'diagnostic-intro')} />;
+    if (route === 'diagnostic-intro') return <DiagnosticIntroScreen grade={state.profile.grade} hasDraft={state.diagnosticDraft?.grade === state.profile.grade} onStart={() => setRoute('diagnostic')} onBack={() => setRoute('onboarding')} />;
+    if (route === 'diagnostic') return <DiagnosticScreen questions={questions} initialAnswers={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.answers : undefined} initialIndex={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.currentIndex : undefined} onProgress={saveDiagnosticDraft} onComplete={completeDiagnostic} onExit={() => setRoute(state.diagnostic ? 'main' : 'diagnostic-intro')} />;
     if (route === 'result' && state.diagnostic) return <DiagnosticResultScreen result={state.diagnostic} onStart={openPriorityLesson} />;
     if (route === 'lesson') return <LessonScreen lesson={selectedLesson} onBack={() => setRoute('main')} onComplete={completeLesson} />;
     if (route === 'pronunciation') return <PronunciationScreen prompt={PRONUNCIATION_PROMPT} bestScore={state.pronunciationBestScore} onBack={() => setRoute('main')} onScore={(score) => setState((current) => ({ ...current, pronunciationBestScore: Math.max(current.pronunciationBestScore ?? 0, score) }))} onComplete={completePronunciation} />;

@@ -1,6 +1,6 @@
-# EngPath — M1 visual language, iteration 2
+# EngPath — M1 visual language, iteration 3
 
-Status: Implemented iteration 3; internal self-audit passed
+Status: Implemented; internal self-audit passed
 Direction: **Study notebook / editorial**, not generic AI dashboard
 
 ## Why iteration 1 failed visually

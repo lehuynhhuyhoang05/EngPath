@@ -1,6 +1,6 @@
 # M0 learner interview guide
 
-Status: Prepared in M0; execution required before M1 can pass  
+Status: Prepared in M0; execution planned after M2 local vertical slice is stable and before external beta  
 Target: 8–12 Vietnamese students in grades 6–9, including at least three grade-9 students  
 Duration: 25–35 minutes per learner
 

@@ -1,7 +1,7 @@
 # EngPath — Kế hoạch phát triển và Quality Gates
 
-Status: Active v1.1  
-Current milestone: M1 — UX direction và design foundation  
+Status: Active v1.2  
+Current milestone: M2 — Local vertical slice chất lượng thật  
 Last reviewed: 2026-09-15  
 Đối tượng lập kế hoạch: một developer chính, có người hỗ trợ duyệt nội dung và tuyển beta  
 Nguyên tắc: **không qua cổng chất lượng thì không chuyển milestone**
@@ -25,16 +25,16 @@ Mỗi milestone phải có đủ:
 
 | Hạng mục | Trạng thái | Nhận định |
 |---|---|---|
-| Product contract | Gần đạt | Tầm nhìn và phạm vi đúng; cần thêm nghiên cứu trực tiếp với học sinh |
+| Product contract | Đạt cho M2 | Tầm nhìn và phạm vi đúng; nghiên cứu học sinh thật được dời tới lúc có bản đủ ổn để thử |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
-| Prototype local | M1 implementation complete | Sáu luồng lõi, design foundation và UI iteration 3 đã qua owner functional review + internal self-audit; chỉ còn Android accessibility và learner evidence để qua gate |
+| Prototype local | M1 PASS | Sáu luồng lõi, design foundation, UI iteration 3, owner functional review, internal self-audit và local checks đã đạt; đã mở M2 |
 | Automated tests | Một phần | 10 test Vitest cho diagnostic, presentation logic và seed data; chưa có component/integration/E2E và chưa cấu hình test runner chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |
 | Grade-10 exam | Chưa làm | Mới có entry card, chưa có exam flow hoàn chỉnh |
 | Beta readiness | Chưa đạt | Chưa có APK beta, analytics tối thiểu, privacy flow hoặc field test |
 
-Prototype hiện tại vẫn chưa được đánh dấu “vertical slice hoàn thành”. [M0 gate](gates/M0-2026-09-15.md) đã pass; M1 hiện active để kiểm chứng UX trước khi hoàn thiện M2.
+Prototype hiện tại đã qua M1 nhưng vẫn chưa được đánh dấu “vertical slice hoàn thành”. [M0 gate](gates/M0-2026-09-15.md) và [M1 gate](gates/M1-2026-09-15.md) đã pass; M2 hiện active để biến prototype thành core loop local đáng tin.
 
 ## 3. Luật qua cổng chung
 
@@ -129,7 +129,7 @@ Test bắt buộc:
 ### M1 — UX direction và design foundation
 
 **Thời lượng ước tính:** 2 tuần  
-**Mục tiêu:** chứng minh học sinh hiểu luồng trước khi mở rộng code.
+**Mục tiêu:** chốt hướng UX và chứng minh nội bộ rằng luồng tự học đủ rõ để bước sang vertical slice thật.
 
 Đầu ra:
 
@@ -137,26 +137,27 @@ Test bắt buộc:
 - prototype bấm được;
 - design tokens, typography, icon direction và component inventory;
 - state catalogue: loading, empty, error, offline, permission denied;
-- report usability vòng 1.
-- 8–12 learner research sessions, trong đó ít nhất năm session dùng prototype bấm được và ít nhất ba người học lớp 9.
+- owner review vòng 1 và internal UX self-audit;
+- research kit sẵn sàng cho vòng học sinh thật sau khi bản local vertical slice đủ ổn để đưa thử.
 
 Gate M1:
 
-- Đạt toàn bộ cổng trong `UX_REDESIGN_PROPOSAL.md` mục 7.
-- Hoàn thành 8–12 research sessions và tổng hợp bằng chứng; phỏng vấn hành vi không đòi hỏi app hoàn chỉnh, còn usability tasks chỉ chạy sau khi prototype M1 sẵn sàng.
-- 4/5 người thử tự hoàn thành chọn mục tiêu → chẩn đoán → bắt đầu nhiệm vụ.
-- 4/5 người thử hoàn thành nghe mẫu → thu → hiểu feedback → thử lại.
-- Người thử tìm thấy khu thi vào 10 khi ở lớp 9, nhưng học sinh lớp 6–8 không bị làm nhiễu bởi nó.
-- Contrast, touch target, text scaling và focus order pass ở các màn lõi.
+- Có prototype bấm được cho sáu luồng lõi: onboarding, chẩn đoán, kết quả, Hôm nay, bài học và phát âm mô phỏng.
+- Owner manual review xác nhận luồng tự học hợp lý ở mức prototype và không còn P0/P1 về nghiệp vụ.
+- UI self-audit xác nhận màn hình không còn kiểu dashboard/AI-template gây hiểu nhầm, đặc biệt ở kết quả và tiến độ.
+- Người dùng lớp 9 thấy được khu thi vào 10 khi chọn đúng hồ sơ; học sinh lớp 6–8 không thấy mục tiêu này.
+- Kết quả chẩn đoán nói rõ độ tin cậy thấp, không cho một câu trả lời biến thành `Khá vững`.
+- Contrast, touch target và nhãn accessibility pass ở mức code/static audit; Android TalkBack/font-scale chuyển sang M2 khi có test device/emulator.
 
 Test bắt buộc:
 
-- moderated usability test;
+- owner scripted manual test;
 - contrast/touch target audit;
-- font scale 200% visual pass;
+- font scale 200% visual pass ở web phone frame, Android xác nhận ở M2;
 - prototype task completion log.
 
-**Không qua M1:** không xây backend và không sản xuất ngân hàng content lớn.
+**Không qua M1:** không xây backend và không sản xuất ngân hàng content lớn.  
+**Ghi chú gate:** 8–12 học sinh thật không còn là điều kiện để pass M1 vì app ở M1 chưa đủ hoàn chỉnh để đưa cho learner thật. Nghiên cứu này vẫn bắt buộc trước private beta và được đưa vào M7/M8; các kiểm chứng nhỏ có thể chạy sau M2 khi luồng local đã ổn.
 
 ### M2 — Local vertical slice chất lượng thật
 
@@ -175,6 +176,7 @@ Gate M2:
 
 - App cold start không cần backend.
 - Core loop chạy từ đầu đến cuối và giữ progress sau restart.
+- Diagnostic đang làm dở được giữ lại khi thoát/restart.
 - Một câu trả lời không thể tạo 100% mastery; result nói rõ khi confidence thấp.
 - Thoát app giữa diagnostic/lesson không làm mất câu đã lưu.
 - Mock pronunciation được gắn nhãn ở code, UI và README.
@@ -428,8 +430,8 @@ Next milestone unlocked: YES / NO
 
 1. Không thêm feature mới trong prototype hiện tại.
 2. Đóng các khoảng trống M0: root Git, CI cơ bản, content validator và research kit.
-3. Thực hiện M1: wireframe + prototype, sau đó hoàn thành 8–12 learner research sessions với ít nhất năm usability tests.
-4. Chốt design system và refactor UI architecture; hoàn tất M2 cùng test stack Jest/RNTL/Maestro.
+3. M1 đã pass bằng wireframe, prototype, design foundation, owner manual review và internal self-audit; learner research thật chuyển sang khi có bản đủ ổn cho học sinh.
+4. Đang thực hiện M2: refactor UI architecture, hoàn thiện local vertical slice, persistence, test stack Jest/RNTL/Maestro và Android manual smoke.
 5. Hoàn tất M3 trước khi đưa content qua API; authoring nháp có thể bắt đầu sau khi M1 pass nhưng không được publish trước gate M3.
 6. Chỉ sau M3 mới triển khai M4 backend/sync.
 7. Phát âm thật và thi vào 10 được xây thành hai milestone độc lập để không che lấp rủi ro của nhau.
