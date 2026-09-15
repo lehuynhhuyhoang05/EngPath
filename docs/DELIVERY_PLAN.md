@@ -1,7 +1,7 @@
 # EngPath — Kế hoạch phát triển và Quality Gates
 
-Status: Active v1.2  
-Current milestone: M2 — Local vertical slice chất lượng thật  
+Status: Active v1.3  
+Current milestone: M3 — Content engine và learning quality  
 Last reviewed: 2026-09-15  
 Đối tượng lập kế hoạch: một developer chính, có người hỗ trợ duyệt nội dung và tuyển beta  
 Nguyên tắc: **không qua cổng chất lượng thì không chuyển milestone**
@@ -27,14 +27,14 @@ Mỗi milestone phải có đủ:
 |---|---|---|
 | Product contract | Đạt cho M2 | Tầm nhìn và phạm vi đúng; nghiên cứu học sinh thật được dời tới lúc có bản đủ ổn để thử |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
-| Prototype local | M1 PASS | Sáu luồng lõi, design foundation, UI iteration 3, owner functional review, internal self-audit và local checks đã đạt; đã mở M2 |
-| Automated tests | Một phần | 29 test Vitest cho diagnostic, mastery, presentation logic, recommendation, mistake notebook, seed data và storage migration; chưa có component/E2E và chưa cấu hình test runner chuẩn Expo |
+| Prototype local | M2 PASS | Core loop local có diagnostic/lesson resume, mastery v1, prerequisite recommendation, mistake notebook và pronunciation mock; đã mở M3 |
+| Automated tests | Một phần | 29 test Vitest cho diagnostic, mastery, presentation logic, recommendation, mistake notebook, seed data và storage migration; web phone-frame E2E smoke pass; chưa có component test stack chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |
 | Grade-10 exam | Chưa làm | Mới có entry card, chưa có exam flow hoàn chỉnh |
 | Beta readiness | Chưa đạt | Chưa có APK beta, analytics tối thiểu, privacy flow hoặc field test |
 
-Prototype hiện tại đã qua M1 nhưng vẫn chưa được đánh dấu “vertical slice hoàn thành”. [M0 gate](gates/M0-2026-09-15.md) và [M1 gate](gates/M1-2026-09-15.md) đã pass; M2 hiện active để biến prototype thành core loop local đáng tin.
+Prototype hiện tại đã qua M2 local vertical slice. [M0 gate](gates/M0-2026-09-15.md), [M1 gate](gates/M1-2026-09-15.md) và [M2 gate](gates/M2-2026-09-15.md) đã pass; M3 hiện active để đưa content thành dữ liệu có version, review và kiểm định chất lượng.
 
 ## 3. Luật qua cổng chung
 
@@ -42,7 +42,7 @@ Một milestone chỉ được chuyển sang `DONE` khi:
 
 1. mọi acceptance criterion được đánh dấu pass và có link tới bằng chứng;
 2. typecheck, lint, unit và integration tests đều pass trên CI;
-3. E2E smoke của các luồng bị ảnh hưởng pass trên Android;
+3. E2E smoke của các luồng bị ảnh hưởng pass; Android runtime E2E bắt buộc khi milestone dùng native behavior hoặc trước APK;
 4. đã test tay trên ít nhất một viewport Android nhỏ và một thiết bị Android vật lý mục tiêu khi milestone yêu cầu native behavior;
 5. không còn P0 hoặc P1; P2 phải có ticket, owner và quyết định xử lý;
 6. tài liệu, trạng thái mock và giới hạn sản phẩm được cập nhật;
@@ -86,7 +86,7 @@ Không dùng một con số coverage tổng thể để thay thế chất lượ
 | Unit | Scoring, mastery, recommendation, review schedule, exam timer/scoring | jest-expo/Jest | Mỗi commit/PR |
 | Component | Render state, tương tác, accessibility role/label | jest-expo + React Native Testing Library | Mỗi PR |
 | Integration | Storage, API contract, offline queue, speech adapter | Jest + test doubles/contract tests | Mỗi PR |
-| E2E | Luồng thật trên app đã build | Maestro trên Android emulator | Smoke mỗi PR; full suite trước gate/release |
+| E2E | Luồng thật trên app đã build | Web phone-frame smoke ở M2; Maestro/Android từ khi có SDK hoặc trước APK | Smoke mỗi PR; full suite trước gate/release |
 | Visual | Layout, overflow, font scaling, viewport nhỏ | Screenshot baseline + manual review | Khi đổi UI |
 | Accessibility | TalkBack, focus order, label, contrast, touch target | Accessibility Scanner + manual | Mỗi UX gate/release |
 | Usability | Học sinh có hiểu và tự hoàn thành không | Scripted observation | Milestone 1, 2 và beta |
@@ -187,12 +187,13 @@ Test bắt buộc:
 - unit: diagnostic, mastery, confidence, prerequisite recommendation, review schedule;
 - component: mỗi màn hình với happy/error/empty state;
 - integration: storage save/load/migration/corrupt data fallback;
-- Maestro E2E: first-run core loop, resume after restart, return learner;
-- manual: small Android viewport và TalkBack smoke.
+- web phone-frame E2E: first-run core loop, resume after restart, return learner, mistake retry và pronunciation mock;
+- Android bundle smoke;
+- Android runtime/TalkBack smoke: required before M7 APK, and earlier if Android SDK/emulator becomes available.
 
 ### M3 — Content engine và learning quality
 
-**Thời lượng ước tính:** 2–3 tuần, có thể song song phần authoring sau khi M1 pass  
+**Thời lượng ước tính:** 2–3 tuần  
 **Mục tiêu:** content là dữ liệu có version và chất lượng đo được, không nằm cứng trong UI.
 
 Đầu ra:
@@ -431,8 +432,8 @@ Next milestone unlocked: YES / NO
 1. Không thêm feature mới trong prototype hiện tại.
 2. Đóng các khoảng trống M0: root Git, CI cơ bản, content validator và research kit.
 3. M1 đã pass bằng wireframe, prototype, design foundation, owner manual review và internal self-audit; learner research thật chuyển sang khi có bản đủ ổn cho học sinh.
-4. Đang thực hiện M2: refactor UI architecture, hoàn thiện local vertical slice, persistence, test stack Jest/RNTL/Maestro và Android manual smoke.
-5. Hoàn tất M3 trước khi đưa content qua API; authoring nháp có thể bắt đầu sau khi M1 pass nhưng không được publish trước gate M3.
+4. M2 đã pass bằng local vertical slice, persistence, mastery/recommendation, mistake notebook, web phone-frame E2E và Android/web bundle smoke.
+5. Đang thực hiện M3: content schema, skill graph, validation, review workflow và sample content chất lượng hơn trước khi đưa content qua API.
 6. Chỉ sau M3 mới triển khai M4 backend/sync.
 7. Phát âm thật và thi vào 10 được xây thành hai milestone độc lập để không che lấp rủi ro của nhau.
 8. AI generative feature đứng sau beta evidence; deterministic personalization đi trước.

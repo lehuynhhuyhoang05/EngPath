@@ -34,8 +34,10 @@ export default function App() {
   useEffect(() => {
     loadAppState().then((stored) => {
       if (stored) {
+        const activeLesson = Object.values(LESSONS_BY_SKILL).find((lesson) => lesson.id === stored.activeLessonId);
         setState({ ...EMPTY_STATE, ...stored });
-        setRoute(stored.profile ? (stored.diagnostic ? 'main' : stored.diagnosticDraft ? 'diagnostic' : 'diagnostic-intro') : 'onboarding');
+        if (activeLesson) setSelectedLessonId(activeLesson.id);
+        setRoute(stored.profile ? (activeLesson ? 'lesson' : stored.diagnostic ? 'main' : stored.diagnosticDraft ? 'diagnostic' : 'diagnostic-intro') : 'onboarding');
       }
       setHydrated(true);
     });
@@ -56,13 +58,20 @@ export default function App() {
   );
 
   const openPriorityLesson = () => {
-    setSelectedLessonId(undefined);
+    setSelectedLessonId(priorityLesson.id);
+    setState((current) => ({ ...current, activeLessonId: priorityLesson.id }));
     setRoute('lesson');
   };
 
   const openLesson = (lesson: Lesson) => {
     setSelectedLessonId(lesson.id);
+    setState((current) => ({ ...current, activeLessonId: lesson.id }));
     setRoute('lesson');
+  };
+
+  const leaveLesson = () => {
+    setState((current) => ({ ...current, activeLessonId: undefined }));
+    setRoute('main');
   };
 
   const finishOnboarding = (profile: LearnerProfile) => {
@@ -71,6 +80,7 @@ export default function App() {
       profile,
       diagnostic: current.profile?.grade === profile.grade ? current.diagnostic : undefined,
       diagnosticDraft: current.profile?.grade === profile.grade ? current.diagnosticDraft : undefined,
+      activeLessonId: current.profile?.grade === profile.grade ? current.activeLessonId : undefined,
       lessonDrafts: current.profile?.grade === profile.grade ? current.lessonDrafts : {},
       masteryStates: current.profile?.grade === profile.grade ? current.masteryStates : {},
       mistakeRecords: current.profile?.grade === profile.grade ? current.mistakeRecords : [],
@@ -97,6 +107,7 @@ export default function App() {
   const completeLesson = () => {
     setState((current) => ({
       ...current,
+      activeLessonId: undefined,
       lessonDrafts: Object.fromEntries(Object.entries(current.lessonDrafts).filter(([lessonId]) => lessonId !== selectedLesson.id)),
       completedLessonIds: current.completedLessonIds.includes(selectedLesson.id) ? current.completedLessonIds : [...current.completedLessonIds, selectedLesson.id],
       completedSessions: current.completedSessions + 1,
@@ -109,7 +120,7 @@ export default function App() {
   const saveLessonDraft = useCallback((lessonId: string, selectedOptionIndex: number | undefined, checked: boolean) => {
     setState((current) => {
       const currentDraft = current.lessonDrafts[lessonId];
-      if (currentDraft?.selectedOptionIndex === selectedOptionIndex && currentDraft.checked === checked) return current;
+      if (currentDraft?.selectedOptionIndex === selectedOptionIndex && currentDraft?.checked === checked) return current;
       return {
         ...current,
         lessonDrafts: {
@@ -157,10 +168,10 @@ export default function App() {
     if (route === 'diagnostic-intro') return <DiagnosticIntroScreen grade={state.profile.grade} hasDraft={state.diagnosticDraft?.grade === state.profile.grade} onStart={() => setRoute('diagnostic')} onBack={() => setRoute('onboarding')} />;
     if (route === 'diagnostic') return <DiagnosticScreen questions={questions} initialAnswers={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.answers : undefined} initialIndex={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.currentIndex : undefined} onProgress={saveDiagnosticDraft} onComplete={completeDiagnostic} onExit={() => setRoute(state.diagnostic ? 'main' : 'diagnostic-intro')} />;
     if (route === 'result' && state.diagnostic) return <DiagnosticResultScreen result={state.diagnostic} onStart={openPriorityLesson} />;
-    if (route === 'lesson') return <LessonScreen key={selectedLesson.id} lesson={selectedLesson} initialDraft={state.lessonDrafts[selectedLesson.id]} onProgress={saveLessonDraft} onChecked={recordAnswer} onBack={() => setRoute('main')} onComplete={completeLesson} />;
+    if (route === 'lesson') return <LessonScreen key={selectedLesson.id} lesson={selectedLesson} initialDraft={state.lessonDrafts[selectedLesson.id]} onProgress={saveLessonDraft} onChecked={recordAnswer} onBack={leaveLesson} onComplete={completeLesson} />;
     if (route === 'pronunciation') return <PronunciationScreen prompt={PRONUNCIATION_PROMPT} bestScore={state.pronunciationBestScore} onBack={() => setRoute('main')} onScore={(score) => setState((current) => ({ ...current, pronunciationBestScore: Math.max(current.pronunciationBestScore ?? 0, score) }))} onComplete={completePronunciation} />;
     if (route === 'exam') return <ExamScreen onBack={() => { setActiveTab('practice'); setRoute('main'); }} />;
-    if (route === 'mistakes') return <MistakeNotebookScreen records={state.mistakeRecords} onBack={() => { setActiveTab('practice'); setRoute('main'); }} onRetry={(lessonId) => { setSelectedLessonId(lessonId); setRoute('lesson'); }} />;
+    if (route === 'mistakes') return <MistakeNotebookScreen records={state.mistakeRecords} onBack={() => { setActiveTab('practice'); setRoute('main'); }} onRetry={(lessonId) => { setSelectedLessonId(lessonId); setState((current) => ({ ...current, activeLessonId: lessonId })); setRoute('lesson'); }} />;
     if (route === 'profile') return <ProfileScreen profile={state.profile} onBack={() => setRoute('main')} onReset={resetPrototype} />;
     return (
       <View style={styles.mainShell}>

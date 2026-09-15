@@ -44,6 +44,7 @@ Ghi `PASS`, `FAIL` hoặc `BLOCKED` và mô tả ngắn. M2 chưa pass nếu cò
 
 ## Kết quả
 
-- P0/P1:
-- P2:
-- Quyết định: PASS / FIX AND RETEST
+- Self-test evidence: `npm run e2e:web` pass ở 420 × 860 và 360 × 640; typecheck, lint, 29 tests, Android/web bundle và Expo doctor pass.
+- P0/P1: none known.
+- P2: Android runtime/TalkBack chưa chạy vì laptop hiện không có `adb`, `emulator` hoặc `maestro`.
+- Quyết định: **PASS FOR M2 LOCAL VERTICAL SLICE** — Android runtime smoke carried to pre-APK gate.

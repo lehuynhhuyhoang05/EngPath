@@ -121,6 +121,7 @@ export interface StoredAppState {
   profile?: LearnerProfile;
   diagnosticDraft?: DiagnosticDraft;
   diagnostic?: DiagnosticResult;
+  activeLessonId?: string;
   lessonDrafts: Record<string, LessonDraft>;
   masteryStates: Record<string, MasteryState>;
   mistakeRecords: MistakeRecord[];

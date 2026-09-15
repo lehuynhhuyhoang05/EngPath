@@ -31,6 +31,7 @@
     "lint": "expo lint App.tsx index.ts src -- --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "e2e:web": "node scripts/e2e-web-smoke.mjs",
     "bundle:android": "expo export --platform android --output-dir dist/android",
     "bundle:web": "expo export --platform web --output-dir dist/web"
   },
