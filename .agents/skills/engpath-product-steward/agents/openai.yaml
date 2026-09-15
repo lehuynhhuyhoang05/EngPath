@@ -1,0 +1,4 @@
+interface:
+  display_name: "EngPath Product Steward"
+  short_description: "Keep EngPath product decisions grounded"
+  default_prompt: "Use $engpath-product-steward to review this EngPath product decision."

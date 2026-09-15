@@ -1,0 +1,4 @@
+interface:
+  display_name: "EngPath Content Lab"
+  short_description: "Author and audit learning content"
+  default_prompt: "Use $engpath-content-lab to create or review this EngPath learning content."
