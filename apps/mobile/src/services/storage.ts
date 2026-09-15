@@ -2,11 +2,47 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { StoredAppState } from '../domain/models';
 
 const STORAGE_KEY = '@engpath/app-state/v1';
+const STORAGE_SCHEMA_VERSION = 2;
+
+interface StoredEnvelope {
+  schemaVersion: number;
+  state: StoredAppState;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isStoredState(value: unknown): value is StoredAppState {
+  return isRecord(value)
+    && Array.isArray(value.completedLessonIds)
+    && typeof value.completedSessions === 'number';
+}
+
+export function parseStoredAppState(serialized: string): StoredAppState | null {
+  try {
+    const parsed: unknown = JSON.parse(serialized);
+
+    if (isRecord(parsed) && 'schemaVersion' in parsed && 'state' in parsed) {
+      const envelope = parsed as Partial<StoredEnvelope>;
+      return isStoredState(envelope.state) ? envelope.state : null;
+    }
+
+    return isStoredState(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function serializeAppState(state: StoredAppState): string {
+  const envelope: StoredEnvelope = { schemaVersion: STORAGE_SCHEMA_VERSION, state };
+  return JSON.stringify(envelope);
+}
 
 export async function loadAppState(): Promise<StoredAppState | null> {
   try {
     const value = await AsyncStorage.getItem(STORAGE_KEY);
-    return value ? (JSON.parse(value) as StoredAppState) : null;
+    return value ? parseStoredAppState(value) : null;
   } catch {
     return null;
   }
@@ -14,7 +50,7 @@ export async function loadAppState(): Promise<StoredAppState | null> {
 
 export async function saveAppState(state: StoredAppState): Promise<void> {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    await AsyncStorage.setItem(STORAGE_KEY, serializeAppState(state));
   } catch {
     // A local storage failure must not block a prototype learning session.
   }

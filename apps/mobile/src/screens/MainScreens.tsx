@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GOALS, LESSONS_BY_SKILL, SKILLS } from '../data/seed';
 import { evidenceConfidence, learningBand, sortSkillsForReview } from '../domain/diagnosticPresentation';
+import { recommendSkillId } from '../domain/recommendation';
 import type { LearnerProfile, Lesson, StoredAppState } from '../domain/models';
 import { BackButton, Button, EmptyState, Icon, Pill, Screen, TextButton } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
@@ -24,7 +25,7 @@ export function TodayScreen({ state, onLesson, onPronunciation, onExam, onProfil
   onExam: () => void;
   onProfile: () => void;
 }) {
-  const priorityId = state.diagnostic?.weakestSkillId ?? 'present-simple';
+  const priorityId = recommendSkillId(state.diagnostic, SKILLS);
   const lesson = LESSONS_BY_SKILL[priorityId] ?? LESSONS_BY_SKILL['present-simple'];
   const examFocus = state.profile?.grade === 9 && state.profile.goalId === 'exam-10';
 
@@ -63,6 +64,7 @@ export function TodayScreen({ state, onLesson, onPronunciation, onExam, onProfil
 
 export function LearnScreen({ state, onLesson, onProfile }: { state: StoredAppState; onLesson: (lesson: Lesson) => void; onProfile: () => void }) {
   const lessons = useMemo(() => Object.values(LESSONS_BY_SKILL).filter((lesson) => lesson.grade <= (state.profile?.grade ?? 9)), [state.profile?.grade]);
+  const recommendedSkillId = useMemo(() => recommendSkillId(state.diagnostic, SKILLS), [state.diagnostic]);
   return (
     <Screen>
       <Header eyebrow={`BÀI HỌC · LỚP ${state.profile?.grade ?? 9}`} title="Chọn một bài để học" onProfile={onProfile} />
@@ -70,7 +72,7 @@ export function LearnScreen({ state, onLesson, onProfile }: { state: StoredAppSt
       <View style={styles.pathList}>
         {lessons.slice(0, 5).map((lesson, index) => {
           const complete = state.completedLessonIds.includes(lesson.id);
-          const recommended = lesson.skillId === state.diagnostic?.weakestSkillId;
+          const recommended = lesson.skillId === recommendedSkillId;
           return (
             <Pressable key={lesson.id} accessibilityRole="button" accessibilityLabel={`Mở bài ${lesson.title}`} onPress={() => onLesson(lesson)} style={({ pressed }) => [styles.pathItem, pressed && styles.pressed]}>
               <View style={[styles.pathIndex, complete && styles.pathIndexComplete]}>{complete ? <Icon name="check" size={18} color={colors.white} /> : <Text style={styles.pathIndexText}>{index + 1}</Text>}</View>
@@ -121,7 +123,8 @@ export function PracticeScreen({ profile, onPronunciation, onExam, onProfile }: 
 
 export function ProgressScreen({ state, onProfile, onLesson }: { state: StoredAppState; onProfile: () => void; onLesson: () => void }) {
   const scores = sortSkillsForReview(state.diagnostic?.skillScores ?? []);
-  const priority = scores[0];
+  const priorityId = recommendSkillId(state.diagnostic, SKILLS);
+  const priority = scores.length ? SKILLS[priorityId] : undefined;
   return (
     <Screen>
       <Header eyebrow={`LỚP ${state.profile?.grade ?? 9} · TIẾN ĐỘ`} title="Em đang học đến đâu?" onProfile={onProfile} />
@@ -155,7 +158,7 @@ export function ProgressScreen({ state, onProfile, onLesson }: { state: StoredAp
       {priority ? (
         <View style={styles.nextBlock}>
           <Text style={styles.nextLabel}>HỌC TIẾP</Text>
-          <Text style={styles.nextTitle}>Ôn {SKILLS[priority.skillId].title}</Text>
+          <Text style={styles.nextTitle}>Ôn {priority.title}</Text>
           <Text style={styles.nextBody}>Một bài ngắn để kiểm tra lại phần đang cần chú ý nhất.</Text>
           <Button label="Mở bài học" onPress={onLesson} />
         </View>

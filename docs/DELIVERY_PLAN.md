@@ -28,7 +28,7 @@ Mỗi milestone phải có đủ:
 | Product contract | Đạt cho M2 | Tầm nhìn và phạm vi đúng; nghiên cứu học sinh thật được dời tới lúc có bản đủ ổn để thử |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
 | Prototype local | M1 PASS | Sáu luồng lõi, design foundation, UI iteration 3, owner functional review, internal self-audit và local checks đã đạt; đã mở M2 |
-| Automated tests | Một phần | 10 test Vitest cho diagnostic, presentation logic và seed data; chưa có component/integration/E2E và chưa cấu hình test runner chuẩn Expo |
+| Automated tests | Một phần | 19 test Vitest cho diagnostic, presentation logic, recommendation, seed data và storage migration; chưa có component/E2E và chưa cấu hình test runner chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |
 | Grade-10 exam | Chưa làm | Mới có entry card, chưa có exam flow hoàn chỉnh |

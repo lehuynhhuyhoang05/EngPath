@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StatusBar as NativeStatusBar, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { diagnosticQuestionsForGrade, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT } from './src/data/seed';
+import { diagnosticQuestionsForGrade, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT, SKILLS } from './src/data/seed';
 import { scoreDiagnostic } from './src/domain/diagnostic';
+import { recommendSkillId } from './src/domain/recommendation';
 import type { LearnerProfile, StoredAppState } from './src/domain/models';
 import type { AppRoute, MainTab } from './src/navigation/routes';
 import { DiagnosticResultScreen, DiagnosticScreen } from './src/screens/DiagnosticScreens';
@@ -41,9 +42,9 @@ export default function App() {
 
   const questions = useMemo(() => diagnosticQuestionsForGrade(state.profile?.grade ?? 9), [state.profile?.grade]);
   const priorityLesson = useMemo(() => {
-    const skillId = state.diagnostic?.weakestSkillId ?? 'present-simple';
+    const skillId = recommendSkillId(state.diagnostic, SKILLS);
     return LESSONS_BY_SKILL[skillId] ?? LESSONS_BY_SKILL['present-simple'];
-  }, [state.diagnostic?.weakestSkillId]);
+  }, [state.diagnostic]);
   const selectedLesson = useMemo(
     () => Object.values(LESSONS_BY_SKILL).find((lesson) => lesson.id === selectedLessonId) ?? priorityLesson,
     [priorityLesson, selectedLessonId],
