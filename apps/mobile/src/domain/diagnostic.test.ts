@@ -4,7 +4,11 @@ import { scoreDiagnostic } from './diagnostic';
 
 describe('scoreDiagnostic', () => {
   it('calculates overall and per-skill scores deterministically', () => {
-    const questions = DIAGNOSTIC_QUESTIONS.slice(0, 3);
+    const questions = ['diag-present-simple-01', 'diag-present-simple-02', 'diag-there-be-01'].map((id) => {
+      const question = DIAGNOSTIC_QUESTIONS.find((item) => item.id === id);
+      if (!question) throw new Error(`Missing test question: ${id}`);
+      return question;
+    });
     const answers = {
       [questions[0].id]: questions[0].correctOptionIndex,
       [questions[1].id]: questions[1].correctOptionIndex,
@@ -20,4 +24,3 @@ describe('scoreDiagnostic', () => {
     expect(() => scoreDiagnostic([], {})).toThrow('at least one question');
   });
 });
-

@@ -14,7 +14,7 @@ The local catalogue is a prototype. All diagnostic questions, lessons, exit chec
 
 ## Learner error reports
 
-The lesson screen stores a selected report reason with the exit question's ID and version on the device. It is explicitly labelled as **not sent**. M4 must add upload, retry, deduplication and an internal triage destination before reports can reach the content team. The prototype currently accepts reports only from lesson exit checks; diagnostic and pronunciation reporting remain M3 work.
+Diagnostic, lesson exit check and pronunciation screens store a selected report reason with the content ID and version on the device. Each screen explicitly labels the report as **not sent**. M4 must add upload, retry, deduplication and an internal triage destination before reports can reach the content team.
 
 ## M3 publication checklist
 
@@ -23,3 +23,4 @@ The lesson screen stores a selected report reason with the exit question's ID an
 - Objective answer and plausible distractors pass independent review; automated checks cannot prove a unique semantic answer.
 - Every lesson has a stated learning objective and a different exit question from the diagnostic item.
 - Grade 9 and exam samples have two independent signed reviews.
+- Use [the grade-9 review packet](M3-GRADE9-REVIEW-PACKET.md) for separate reviews before updating any publication status.

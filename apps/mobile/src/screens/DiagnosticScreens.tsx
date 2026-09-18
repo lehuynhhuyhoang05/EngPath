@@ -1,16 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { evidenceConfidence, learningBand, sortSkillsForReview } from '../domain/diagnosticPresentation';
-import type { ChoiceQuestion, DiagnosticResult } from '../domain/models';
+import type { ChoiceQuestion, ContentReportReason, DiagnosticResult } from '../domain/models';
 import { SKILLS } from '../data/seed';
 import { BackButton, Button, Icon, Pill, ProgressBar, Screen } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
+import { ContentReportControl } from './ContentReportControl';
 
-export function DiagnosticScreen({ questions, initialAnswers, initialIndex, onProgress, onComplete, onExit }: {
+export function DiagnosticScreen({ questions, initialAnswers, initialIndex, reportedContentRefs, onProgress, onReport, onComplete, onExit }: {
   questions: ChoiceQuestion[];
   initialAnswers?: Record<string, number>;
   initialIndex?: number;
+  reportedContentRefs?: string[];
   onProgress?: (answers: Record<string, number>, currentIndex: number) => void;
+  onReport?: (question: ChoiceQuestion, reason: ContentReportReason) => void;
   onComplete: (answers: Record<string, number>) => void;
   onExit: () => void;
 }) {
@@ -79,6 +82,7 @@ export function DiagnosticScreen({ questions, initialAnswers, initialIndex, onPr
           <Text style={styles.unknownText}>Em chưa biết</Text>
         </Pressable>
       </View>
+      <ContentReportControl key={question.id} kind="question" hasReport={reportedContentRefs?.includes(`${question.id}:${question.version}`) ?? false} onReport={(reason) => onReport?.(question, reason)} />
     </Screen>
   );
 }

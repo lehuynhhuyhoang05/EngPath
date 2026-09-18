@@ -10,7 +10,7 @@ The mobile technology decision is recorded in [docs/ADR-001-mobile-platform.md](
 
 ## Repository status
 
-The first React Native/Expo vertical slice is implemented with local seed data. It includes onboarding, a grade-aware diagnostic, a skill map, a recommended lesson, a mocked pronunciation assessment flow, progress, and local persistence. A NestJS API and PostgreSQL persistence follow in the next milestone.
+The React Native/Expo local vertical slice has passed M2. It includes onboarding, a grade-aware diagnostic, a skill map, recommended lessons, a mocked pronunciation flow, progress, mistake review and local persistence. M3 content work is in progress: the structured catalogue has two prototype topics per grade, a draft grade-9 exam-style sample and local content error reports. None of this learning content is published or educator-approved yet. Backend sync follows after the M3 quality gate.
 
 ## Run the mobile prototype
 
@@ -40,6 +40,8 @@ npm run android
 
 The pronunciation score is intentionally mocked. The UI states this clearly and does not record or upload audio yet.
 
+To inspect the phone-frame UI on this laptop, run `npm run web -- --port 8082 --host localhost` from `apps/mobile`, then open `http://localhost:8082`. The M3 owner check is in [docs/gates/M3-MANUAL-TEST.md](docs/gates/M3-MANUAL-TEST.md).
+
 ## Current milestone
 
-M0 foundation passed on 2026-09-15 and M1 UX direction is active. The learner research kit starts at [docs/research/M0_INTERVIEW_GUIDE.md](docs/research/M0_INTERVIEW_GUIDE.md), and gate evidence is recorded under `docs/gates/`.
+M0, M1 and M2 have passed. M3 remains open until independent content review, learner comprehension and owner manual checks are recorded. The grade-9 reviewer packet is in [docs/content/M3-GRADE9-REVIEW-PACKET.md](docs/content/M3-GRADE9-REVIEW-PACKET.md), and gate evidence is recorded under `docs/gates/`.

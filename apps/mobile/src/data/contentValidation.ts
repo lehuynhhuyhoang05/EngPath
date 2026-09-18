@@ -9,7 +9,7 @@ export interface ContentIssue {
 }
 
 const stableIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const placeholderPattern = /pending|requires? (?:educator )?review|chưa (?:duyệt|xác minh)/i;
+const placeholderPattern = /prototype|pending|requires? (?:educator )?review|chưa (?:duyệt|xác minh)/i;
 
 function issue(contentId: string, code: string, message: string): ContentIssue {
   return { code, contentId, message };
@@ -23,7 +23,7 @@ function isValidIsoDate(value: string): boolean {
   return !Number.isNaN(Date.parse(value));
 }
 
-function validateMetadata(item: ContentMetadata, skills: Record<string, LearningSkill>): ContentIssue[] {
+export function validateContentMetadata(item: ContentMetadata, skills: Record<string, LearningSkill>): ContentIssue[] {
   const issues: ContentIssue[] = [];
 
   if (!stableIdPattern.test(item.id)) {
@@ -80,7 +80,7 @@ function validateMetadata(item: ContentMetadata, skills: Record<string, Learning
 }
 
 function validateQuestion(item: ChoiceQuestion, skills: Record<string, LearningSkill>): ContentIssue[] {
-  const issues = validateMetadata(item, skills);
+  const issues = validateContentMetadata(item, skills);
   const normalizedOptions = item.options.map((option) => option.trim().toLocaleLowerCase('en'));
 
   if (!skills[item.skillId] || !item.skills.includes(item.skillId)) {
@@ -112,7 +112,7 @@ function validateQuestion(item: ChoiceQuestion, skills: Record<string, LearningS
 }
 
 function validateLesson(item: Lesson, skills: Record<string, LearningSkill>): ContentIssue[] {
-  const issues = validateMetadata(item, skills);
+  const issues = validateContentMetadata(item, skills);
 
   if (!skills[item.skillId] || !item.skills.includes(item.skillId)) {
     issues.push(issue(item.id, 'invalid-primary-skill', 'Lesson skillId must exist and appear in skills.'));
@@ -135,7 +135,7 @@ function validateLesson(item: Lesson, skills: Record<string, LearningSkill>): Co
 }
 
 function validatePronunciation(item: PronunciationPrompt, skills: Record<string, LearningSkill>): ContentIssue[] {
-  const issues = validateMetadata(item, skills);
+  const issues = validateContentMetadata(item, skills);
 
   if (!isNonEmpty(item.text)) {
     issues.push(issue(item.id, 'missing-pronunciation-text', 'Pronunciation text cannot be empty.'));

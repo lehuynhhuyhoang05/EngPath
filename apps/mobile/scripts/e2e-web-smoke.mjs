@@ -184,6 +184,9 @@ async function runFlow(client) {
   await expectText(client, 'Bắt đầu chẩn đoán');
   await clickText(client, 'Bắt đầu chẩn đoán');
   await expectText(client, 'Câu 1/');
+  await clickText(client, 'Báo nội dung có vấn đề');
+  await clickText(client, 'Đáp án có thể sai');
+  await expectText(client, 'Đã lưu báo cáo trên máy');
   await clickContains(client, 'does');
   await clickText(client, 'Câu tiếp theo');
   await clickText(client, 'Thoát');
@@ -194,15 +197,20 @@ async function runFlow(client) {
   await waitFor(client, 'document.readyState === "complete"', 'diagnostic reload');
   await expectText(client, 'Câu 2/');
 
-  for (let question = 2; question <= 9; question += 1) {
+  for (let question = 2; question <= 14; question += 1) {
+    if (question === 14) {
+      await expectText(client, 'Every Friday, Linh and her classmates');
+      await assertNoHorizontalOverflow(client);
+    }
     await clickText(client, 'Em chưa biết');
-    await clickText(client, question === 9 ? 'Xem định hướng' : 'Câu tiếp theo');
+    await clickText(client, question === 14 ? 'Xem định hướng' : 'Câu tiếp theo');
   }
 
   await expectText(client, 'Bài đầu tiên:');
   await clickText(client, 'Bắt đầu nhiệm vụ đầu tiên');
   await expectText(client, 'Kiểm tra đáp án');
   await expectText(client, 'Sau bài này:');
+  await assertNoHorizontalOverflow(client);
   await clickText(client, 'Báo nội dung có vấn đề');
   await clickText(client, 'Giải thích khó hiểu');
   await expectText(client, 'Đã lưu báo cáo trên máy');
@@ -232,6 +240,9 @@ async function runFlow(client) {
   await clickText(client, 'Luyện');
   await clickText(client, 'Luyện âm /θ/');
   await expectText(client, 'Mô phỏng UX');
+  await clickText(client, 'Báo nội dung có vấn đề');
+  await clickText(client, 'Câu luyện có vấn đề');
+  await expectText(client, 'Đã lưu báo cáo trên máy');
   await clickText(client, 'Nghe mẫu');
   await clickText(client, 'Thu bản thử');
   await waitFor(client, 'document.body.innerText.includes("Đang mô phỏng thu âm") || document.body.innerText.includes("Dừng bản thu mô phỏng")', 'recording state', 4_000);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ChoiceQuestion } from '../domain/models';
 import { validateCatalogue, validateContent, validateContentRevision, validateSkillGraph } from './contentValidation';
-import { DIAGNOSTIC_QUESTIONS, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT, SKILLS } from './seed';
+import { diagnosticQuestionsForGrade, DIAGNOSTIC_QUESTIONS, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT, SKILLS } from './seed';
 
 describe('prototype learning content', () => {
   it('keeps objective questions structurally valid', () => {
@@ -28,6 +28,16 @@ describe('prototype learning content', () => {
       expect(diagnosticIds.has(lesson.question.id)).toBe(false);
       expect(lesson.question.prompt).not.toBe(lesson.example);
     }
+  });
+
+  it('preserves the original diagnostic order when extending a saved draft', () => {
+    const originalGrade9 = [
+      'diag-present-simple-01', 'diag-present-simple-02', 'diag-there-be-01', 'diag-past-simple-01',
+      'diag-adverb-01', 'diag-comparison-01', 'diag-present-perfect-01',
+      'diag-relative-clause-01', 'diag-first-conditional-01',
+    ];
+    expect(diagnosticQuestionsForGrade(9).slice(0, 9).map((item) => item.id)).toEqual(originalGrade9);
+    expect(diagnosticQuestionsForGrade(6).slice(0, 4).map((item) => item.id)).toEqual(originalGrade9.slice(0, 4));
   });
 
   it('targets a pronunciation feature that exists in the scripted sentence', () => {

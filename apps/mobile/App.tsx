@@ -141,10 +141,10 @@ export default function App() {
     }));
   }, []);
 
-  const reportLessonContent = useCallback((lesson: Lesson, reason: ContentReportReason) => {
+  const reportContent = useCallback((contentId: string, contentVersion: number, reason: ContentReportReason) => {
     setState((current) => ({
       ...current,
-      contentReports: recordContentReport(current.contentReports, lesson.question.id, lesson.question.version, reason),
+      contentReports: recordContentReport(current.contentReports, contentId, contentVersion, reason),
     }));
   }, []);
 
@@ -175,10 +175,10 @@ export default function App() {
     if (route === 'onboarding') return <OnboardingScreen initialProfile={state.profile} onContinue={finishOnboarding} />;
     if (!state.profile) return <OnboardingScreen onContinue={finishOnboarding} />;
     if (route === 'diagnostic-intro') return <DiagnosticIntroScreen grade={state.profile.grade} hasDraft={state.diagnosticDraft?.grade === state.profile.grade} onStart={() => setRoute('diagnostic')} onBack={() => setRoute('onboarding')} />;
-    if (route === 'diagnostic') return <DiagnosticScreen questions={questions} initialAnswers={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.answers : undefined} initialIndex={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.currentIndex : undefined} onProgress={saveDiagnosticDraft} onComplete={completeDiagnostic} onExit={() => setRoute(state.diagnostic ? 'main' : 'diagnostic-intro')} />;
+    if (route === 'diagnostic') return <DiagnosticScreen questions={questions} initialAnswers={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.answers : undefined} initialIndex={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.currentIndex : undefined} reportedContentRefs={state.contentReports.map((report) => `${report.contentId}:${report.contentVersion}`)} onProgress={saveDiagnosticDraft} onReport={(question, reason) => reportContent(question.id, question.version, reason)} onComplete={completeDiagnostic} onExit={() => setRoute(state.diagnostic ? 'main' : 'diagnostic-intro')} />;
     if (route === 'result' && state.diagnostic) return <DiagnosticResultScreen result={state.diagnostic} onStart={openPriorityLesson} />;
-    if (route === 'lesson') return <LessonScreen key={selectedLesson.id} lesson={selectedLesson} initialDraft={state.lessonDrafts[selectedLesson.id]} hasReport={state.contentReports.some((report) => report.contentId === selectedLesson.question.id && report.contentVersion === selectedLesson.question.version)} onProgress={saveLessonDraft} onChecked={recordAnswer} onReport={reportLessonContent} onBack={leaveLesson} onComplete={completeLesson} />;
-    if (route === 'pronunciation') return <PronunciationScreen prompt={PRONUNCIATION_PROMPT} bestScore={state.pronunciationBestScore} onBack={() => setRoute('main')} onScore={(score) => setState((current) => ({ ...current, pronunciationBestScore: Math.max(current.pronunciationBestScore ?? 0, score) }))} onComplete={completePronunciation} />;
+    if (route === 'lesson') return <LessonScreen key={selectedLesson.id} lesson={selectedLesson} initialDraft={state.lessonDrafts[selectedLesson.id]} hasReport={state.contentReports.some((report) => report.contentId === selectedLesson.question.id && report.contentVersion === selectedLesson.question.version)} onProgress={saveLessonDraft} onChecked={recordAnswer} onReport={(lesson, reason) => reportContent(lesson.question.id, lesson.question.version, reason)} onBack={leaveLesson} onComplete={completeLesson} />;
+    if (route === 'pronunciation') return <PronunciationScreen prompt={PRONUNCIATION_PROMPT} bestScore={state.pronunciationBestScore} hasReport={state.contentReports.some((report) => report.contentId === PRONUNCIATION_PROMPT.id && report.contentVersion === PRONUNCIATION_PROMPT.version)} onReport={(prompt, reason) => reportContent(prompt.id, prompt.version, reason)} onBack={() => setRoute('main')} onScore={(score) => setState((current) => ({ ...current, pronunciationBestScore: Math.max(current.pronunciationBestScore ?? 0, score) }))} onComplete={completePronunciation} />;
     if (route === 'exam') return <ExamScreen onBack={() => { setActiveTab('practice'); setRoute('main'); }} />;
     if (route === 'mistakes') return <MistakeNotebookScreen records={state.mistakeRecords} onBack={() => { setActiveTab('practice'); setRoute('main'); }} onRetry={(lessonId) => { setSelectedLessonId(lessonId); setState((current) => ({ ...current, activeLessonId: lessonId })); setRoute('lesson'); }} />;
     if (route === 'profile') return <ProfileScreen profile={state.profile} onBack={() => setRoute('main')} onReset={resetPrototype} />;

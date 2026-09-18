@@ -28,11 +28,11 @@ Mỗi milestone phải có đủ:
 |---|---|---|
 | Product contract | Đạt cho M2 | Tầm nhìn và phạm vi đúng; nghiên cứu học sinh thật được dời tới lúc có bản đủ ổn để thử |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
-| Prototype local | M3 đang làm | M2 đã pass; M3 đã tách nội dung bài học khỏi câu chẩn đoán, có objective và exit check riêng; báo lỗi nội dung được lưu cục bộ, chưa gửi đi |
-| Automated tests | Một phần | 34 test Vitest gồm content validation, skill graph, revision, diagnostic/mastery/storage; web phone-frame E2E smoke pass; chưa có component test stack chuẩn Expo |
+| Prototype local | M3 đang làm | Hai chủ điểm mỗi lớp, chẩn đoán 8–14 câu, lesson objective/exit check riêng, mẫu luyện thi lớp 9 dạng dữ liệu; báo lỗi chẩn đoán/bài học/phát âm được lưu cục bộ, chưa gửi đi |
+| Automated tests | Một phần | 40 test Vitest gồm content/exam validation, skill graph, revision, scoring, diagnostic/mastery/storage; web phone-frame E2E smoke pass; chưa có component test stack chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |
-| Grade-10 exam | Chưa làm | Mới có entry card, chưa có exam flow hoàn chỉnh |
+| Grade-10 exam | M3 content draft | Có mẫu luyện thi 3 câu và schema/template chấm điểm; app mới có entry card, màn làm đề thuộc M6; chưa gắn tỉnh/năm chính thức |
 | Beta readiness | Chưa đạt | Chưa có APK beta, analytics tối thiểu, privacy flow hoặc field test |
 
 Prototype hiện tại đã qua M2 local vertical slice. [M0 gate](gates/M0-2026-09-15.md), [M1 gate](gates/M1-2026-09-15.md) và [M2 gate](gates/M2-2026-09-15.md) đã pass; M3 hiện active để đưa content thành dữ liệu có version, review và kiểm định chất lượng.

@@ -69,6 +69,17 @@ export interface PronunciationPrompt extends ContentMetadata {
   remediationVi: string;
 }
 
+export interface ExamTemplate extends ContentMetadata {
+  type: 'exam-template';
+  kind: 'practice-sample' | 'province-specific';
+  province?: string;
+  schoolYear?: string;
+  durationMinutes: number;
+  pointsPerQuestion: number;
+  questionIds: string[];
+  independentReviews: { reviewerId: string; reviewedAt: string; decision: 'pass' | 'revise' | 'reject' }[];
+}
+
 export interface SkillScore {
   skillId: string;
   score: number;
@@ -118,7 +129,7 @@ export interface MistakeRecord {
   status: 'active' | 'resolved';
 }
 
-export type ContentReportReason = 'answer' | 'explanation' | 'typo';
+export type ContentReportReason = 'answer' | 'explanation' | 'typo' | 'prompt';
 
 export interface ContentReport {
   contentId: string;
