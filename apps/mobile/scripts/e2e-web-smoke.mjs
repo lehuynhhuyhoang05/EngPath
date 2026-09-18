@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -237,6 +237,10 @@ async function runFlow(client) {
   await expectText(client, 'Trống');
   await clickText(client, 'Tiến độ');
   await expectText(client, 'Em đang học đến đâu?');
+  if (process.env.ENGPATH_E2E_SCREENSHOT_PATH) {
+    const screenshot = await client.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+    await writeFile(process.env.ENGPATH_E2E_SCREENSHOT_PATH, Buffer.from(screenshot.data, 'base64'));
+  }
   await clickText(client, 'Luyện');
   await clickText(client, 'Luyện âm /θ/');
   await expectText(client, 'Mô phỏng UX');

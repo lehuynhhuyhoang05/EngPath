@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { DiagnosticResult } from './models';
-import { recommendSkillId, recommendSkillIdForState } from './recommendation';
+import { recommendSkillForState, recommendSkillId, recommendSkillIdForState } from './recommendation';
 
 const skills = {
   foundation: { id: 'foundation', title: 'Foundation', area: 'Ngữ pháp' as const, minimumGrade: 6 as const, prerequisiteIds: [] },
@@ -28,13 +28,27 @@ describe('recommendSkillId', () => {
       { skillId: 'foundation', score: 80, correct: 4, total: 5 },
       { skillId: 'target', score: 40, correct: 2, total: 5 },
     ]), skills)).toBe('target');
+    expect(recommendSkillForState({
+      diagnostic: result([
+        { skillId: 'foundation', score: 80, correct: 4, total: 5 },
+        { skillId: 'target', score: 40, correct: 2, total: 5 },
+      ]),
+      masteryStates: {},
+    }, skills)).toEqual({ skillId: 'target', targetSkillId: 'target', reason: 'practice' });
   });
 
   it('repairs a weak prerequisite before the higher-level weak skill', () => {
     expect(recommendSkillId(result([
-      { skillId: 'foundation', score: 25, correct: 1, total: 4 },
-      { skillId: 'target', score: 40, correct: 2, total: 5 },
+      { skillId: 'foundation', score: 40, correct: 2, total: 5 },
+      { skillId: 'target', score: 25, correct: 1, total: 4 },
     ]), skills)).toBe('foundation');
+    expect(recommendSkillForState({
+      diagnostic: result([
+        { skillId: 'foundation', score: 40, correct: 2, total: 5 },
+        { skillId: 'target', score: 25, correct: 1, total: 4 },
+      ]),
+      masteryStates: {},
+    }, skills)).toEqual({ skillId: 'foundation', targetSkillId: 'target', reason: 'prerequisite' });
   });
 
   it('treats an unobserved prerequisite as a repair candidate', () => {

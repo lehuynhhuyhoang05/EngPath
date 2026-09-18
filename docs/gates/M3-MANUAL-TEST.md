@@ -16,3 +16,9 @@ Mở `http://localhost:8082` khi dev server chạy. Nếu không còn chạy, t�
 4. Đặt lại toàn bộ hồ sơ. Kỳ vọng các báo cáo cục bộ bị xóa cùng tiến độ mẫu.
 
 Ghi lại: viewport/kích thước máy, thao tác không đúng kỳ vọng, ảnh màn hình (nếu có), mức lỗi P0/P1/P2/P3 và nhận xét câu nào khó hiểu. Đây là kiểm tra owner trên web; Android runtime/TalkBack vẫn cần kiểm tra khi có công cụ hoặc thiết bị.
+
+## Kết quả owner cung cấp
+
+Ngày nhận phản hồi: 2026-09-18. Owner báo đã test tay, “oke k lỗi”, và gửi ảnh màn Tiến độ lớp 8 trên khung điện thoại. Đây là xác nhận **không thấy lỗi trong phần đã thử**, chưa có ghi chép từng bước của kịch bản trên, viewport, thiết bị Android hoặc font scale. Bằng chứng này không thay thế kiểm tra Android runtime/TalkBack hay quan sát khả năng hiểu bài của học sinh.
+
+Sau phản hồi này, màn Tiến độ được chỉnh lại. Cần owner nhìn bản mới: nút “Mở bài học” xuất hiện trước danh sách, lý do học kiến thức nền đúng với bài được đề xuất, mặc định chỉ thấy bốn kỹ năng và có thể mở rộng, nhãn phát âm ghi rõ “mô phỏng”.

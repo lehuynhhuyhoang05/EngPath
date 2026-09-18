@@ -3,12 +3,18 @@ import type { DiagnosticResult, LearningSkill, SkillScore, StoredAppState } from
 
 const DEFAULT_RECOMMENDED_SKILL_ID = 'present-simple';
 
+export interface SkillRecommendation {
+  skillId: string;
+  targetSkillId: string;
+  reason: 'fallback' | 'practice' | 'prerequisite';
+}
+
 export function recommendSkillId(
   result: DiagnosticResult | undefined,
   skills: Record<string, LearningSkill>,
   fallbackSkillId = DEFAULT_RECOMMENDED_SKILL_ID,
 ): string {
-  return recommendSkillIdFromScores(result?.skillScores ?? [], skills, fallbackSkillId);
+  return recommendSkillFromScores(result?.skillScores ?? [], skills, fallbackSkillId).skillId;
 }
 
 export function recommendSkillIdForState(
@@ -16,8 +22,16 @@ export function recommendSkillIdForState(
   skills: Record<string, LearningSkill>,
   fallbackSkillId = DEFAULT_RECOMMENDED_SKILL_ID,
 ): string {
+  return recommendSkillForState(state, skills, fallbackSkillId).skillId;
+}
+
+export function recommendSkillForState(
+  state: Pick<StoredAppState, 'diagnostic' | 'masteryStates'>,
+  skills: Record<string, LearningSkill>,
+  fallbackSkillId = DEFAULT_RECOMMENDED_SKILL_ID,
+): SkillRecommendation {
   const masteryScores = skillScoresFromMastery(state.masteryStates);
-  return recommendSkillIdFromScores(masteryScores.length ? masteryScores : state.diagnostic?.skillScores ?? [], skills, fallbackSkillId);
+  return recommendSkillFromScores(masteryScores.length ? masteryScores : state.diagnostic?.skillScores ?? [], skills, fallbackSkillId);
 }
 
 export function recommendSkillIdFromScores(
@@ -25,7 +39,16 @@ export function recommendSkillIdFromScores(
   skills: Record<string, LearningSkill>,
   fallbackSkillId = DEFAULT_RECOMMENDED_SKILL_ID,
 ): string {
-  if (!skillScores.length) return fallbackSkillId;
+  return recommendSkillFromScores(skillScores, skills, fallbackSkillId).skillId;
+}
+
+export function recommendSkillFromScores(
+  skillScores: SkillScore[],
+  skills: Record<string, LearningSkill>,
+  fallbackSkillId = DEFAULT_RECOMMENDED_SKILL_ID,
+): SkillRecommendation {
+  const fallback: SkillRecommendation = { skillId: fallbackSkillId, targetSkillId: fallbackSkillId, reason: 'fallback' };
+  if (!skillScores.length) return fallback;
 
   const scores = new Map(skillScores.map((score) => [score.skillId, score]));
   const candidates = [...skillScores].sort((a, b) => a.score - b.score || b.total - a.total);
@@ -39,8 +62,10 @@ export function recommendSkillIdFromScores(
       return !prerequisiteScore || prerequisiteScore.score < 50;
     });
 
-    return weakPrerequisite ?? candidate.skillId;
+    return weakPrerequisite
+      ? { skillId: weakPrerequisite, targetSkillId: candidate.skillId, reason: 'prerequisite' }
+      : { skillId: candidate.skillId, targetSkillId: candidate.skillId, reason: 'practice' };
   }
 
-  return fallbackSkillId;
+  return fallback;
 }

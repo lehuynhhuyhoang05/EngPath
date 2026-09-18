@@ -4,7 +4,7 @@ import { GOALS, LESSONS_BY_SKILL, SKILLS } from '../data/seed';
 import { evidenceConfidence, learningBand, sortSkillsForReview } from '../domain/diagnosticPresentation';
 import { skillScoresFromMastery } from '../domain/mastery';
 import { activeMistakes } from '../domain/mistakes';
-import { recommendSkillIdForState } from '../domain/recommendation';
+import { recommendSkillForState, recommendSkillIdForState } from '../domain/recommendation';
 import type { LearnerProfile, Lesson, MistakeRecord, StoredAppState } from '../domain/models';
 import { BackButton, Button, EmptyState, Icon, Pill, Screen, TextButton } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
@@ -177,27 +177,38 @@ export function MistakeNotebookScreen({ records, onBack, onRetry }: {
 }
 
 export function ProgressScreen({ state, onProfile, onLesson }: { state: StoredAppState; onProfile: () => void; onLesson: () => void }) {
+  const [showAllSkills, setShowAllSkills] = useState(false);
   const masteryScores = skillScoresFromMastery(state.masteryStates);
   const scores = sortSkillsForReview(masteryScores.length ? masteryScores : state.diagnostic?.skillScores ?? []);
-  const priorityId = recommendSkillIdForState(state, SKILLS);
+  const visibleScores = showAllSkills ? scores : scores.slice(0, 4);
+  const recommendation = recommendSkillForState(state, SKILLS);
+  const priorityId = recommendation.skillId;
   const priority = scores.length ? SKILLS[priorityId] : undefined;
+  const prerequisiteTarget = recommendation.reason === 'prerequisite' ? SKILLS[recommendation.targetSkillId] : undefined;
   return (
     <Screen>
       <Header eyebrow={`LỚP ${state.profile?.grade ?? 9} · TIẾN ĐỘ`} title="Em đang học đến đâu?" onProfile={onProfile} />
       <View style={styles.summary}>
-        <Text style={styles.summaryStrong}>{state.completedSessions} buổi học</Text>
+        <Text style={styles.summaryStrong}>{state.completedSessions} lượt luyện</Text>
         <View style={styles.summaryDot} />
         <Text style={styles.summaryText}>{state.completedLessonIds.length} bài đã xong</Text>
         <View style={styles.summaryDot} />
-        <Text style={styles.summaryText}>{state.pronunciationBestScore ? 'Đã luyện nói' : 'Chưa luyện nói'}</Text>
+        <Text style={styles.summaryText}>{state.pronunciationBestScore ? 'Đã thử phát âm (mô phỏng)' : 'Chưa thử phát âm'}</Text>
       </View>
-      <Text style={styles.sectionTitle}>Kỹ năng đã kiểm tra</Text>
-      <Text style={styles.sectionIntro}>Các vạch nhỏ cho biết EngPath đã thấy bao nhiêu lượt làm, không phải phần trăm thành thạo.</Text>
+      {priority ? (
+        <View style={styles.nextBlock}>
+          <Text style={styles.nextLabel}>BÀI NÊN HỌC TIẾP</Text>
+          <Text style={styles.nextTitle}>Ôn {priority.title}</Text>
+          <Text style={styles.nextBody}>{prerequisiteTarget ? `Học phần nền này trước khi ôn ${prerequisiteTarget.title}.` : 'EngPath chọn bài này từ các lượt em đã làm; luyện thêm sẽ giúp kết quả rõ hơn.'}</Text>
+          <Button label="Mở bài học" onPress={onLesson} />
+        </View>
+      ) : null}
+      <Text style={styles.sectionTitle}>Kỹ năng đã kiểm tra{scores.length ? ` (${scores.length})` : ''}</Text>
+      <Text style={styles.sectionIntro}>Mỗi vạch là một lượt làm, không phải phần trăm thành thạo.</Text>
       {scores.length ? (
         <View style={styles.progressList}>
-          {scores.map((skill, index) => (
-            <View key={skill.skillId} style={[styles.progressItem, index === 0 && styles.progressItemPriority]}>
-              <Text style={styles.skillNumber}>{String(index + 1).padStart(2, '0')}</Text>
+          {visibleScores.map((skill) => (
+            <View key={skill.skillId} style={styles.progressItem}>
               <View style={styles.skillContent}>
                 <View style={styles.progressTop}>
                   <Text style={styles.pathTitle}>{SKILLS[skill.skillId].title}</Text>
@@ -208,17 +219,10 @@ export function ProgressScreen({ state, onProfile, onLesson }: { state: StoredAp
               </View>
             </View>
           ))}
+          {scores.length > 4 ? <TextButton label={showAllSkills ? 'Thu gọn danh sách' : `Xem thêm ${scores.length - 4} kỹ năng`} onPress={() => setShowAllSkills((current) => !current)} /> : null}
         </View>
       ) : <EmptyState icon="chart" title="Chưa có dữ liệu tiến độ" body="Hoàn thành chẩn đoán để EngPath tạo bản đồ kỹ năng ban đầu." />}
       <View style={styles.draftNote}><Icon name="alert" size={20} color={colors.warning} /><Text style={styles.draftText}>Kết quả này còn có thể thay đổi. EngPath chỉ gọi một kỹ năng là “khá vững” sau ít nhất bốn lượt làm.</Text></View>
-      {priority ? (
-        <View style={styles.nextBlock}>
-          <Text style={styles.nextLabel}>HỌC TIẾP</Text>
-          <Text style={styles.nextTitle}>Ôn {priority.title}</Text>
-          <Text style={styles.nextBody}>Một bài ngắn để kiểm tra lại phần đang cần chú ý nhất.</Text>
-          <Button label="Mở bài học" onPress={onLesson} />
-        </View>
-      ) : null}
     </Screen>
   );
 }
@@ -346,7 +350,6 @@ const styles = StyleSheet.create({
   sectionIntro: { ...type.caption, color: colors.muted, marginTop: -4, marginBottom: spacing.md },
   progressList: { borderTopWidth: 1, borderColor: colors.line },
   progressItem: { flexDirection: 'row', gap: spacing.sm, paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.line },
-  progressItemPriority: { borderLeftWidth: 3, borderLeftColor: colors.accent, paddingLeft: spacing.sm },
   skillNumber: { ...type.caption, color: colors.lineStrong, width: 24 },
   skillContent: { flex: 1 },
   progressTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing.sm },
@@ -356,7 +359,7 @@ const styles = StyleSheet.create({
   evidenceMark: { width: 16, height: 4, backgroundColor: colors.line },
   evidenceMarkFilled: { backgroundColor: colors.primary },
   evidenceLabel: { ...type.caption, color: colors.muted, marginLeft: spacing.xs },
-  nextBlock: { borderTopWidth: 3, borderTopColor: colors.accent, paddingTop: spacing.md, marginTop: spacing.xl },
+  nextBlock: { borderTopWidth: 3, borderTopColor: colors.accent, paddingTop: spacing.md, marginBottom: spacing.xl },
   nextLabel: { ...type.caption, color: colors.accent, letterSpacing: 0.8 },
   nextTitle: { ...type.heading, color: colors.ink, marginTop: spacing.xs },
   nextBody: { ...type.body, color: colors.muted, marginTop: 2, marginBottom: spacing.md },
