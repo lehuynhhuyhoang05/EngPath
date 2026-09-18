@@ -117,12 +117,19 @@ function validateLesson(item: Lesson, skills: Record<string, LearningSkill>): Co
   if (!skills[item.skillId] || !item.skills.includes(item.skillId)) {
     issues.push(issue(item.id, 'invalid-primary-skill', 'Lesson skillId must exist and appear in skills.'));
   }
-  if (!isNonEmpty(item.title) || !isNonEmpty(item.summary) || !isNonEmpty(item.explanationVi)) {
-    issues.push(issue(item.id, 'incomplete-lesson', 'Lesson requires title, summary and Vietnamese explanation.'));
+  if (!isNonEmpty(item.title) || !isNonEmpty(item.summary) || !isNonEmpty(item.learningObjectiveVi) || !isNonEmpty(item.explanationVi) || !isNonEmpty(item.example) || !isNonEmpty(item.exampleVi)) {
+    issues.push(issue(item.id, 'incomplete-lesson', 'Lesson requires title, summary, objective, rule and explained example.'));
   }
   if (item.question.skillId !== item.skillId) {
     issues.push(issue(item.id, 'lesson-question-skill-mismatch', 'Lesson exit question must target the lesson primary skill.'));
   }
+  if (item.question.grade !== item.grade) {
+    issues.push(issue(item.id, 'lesson-question-grade-mismatch', 'Lesson exit question must target the lesson grade.'));
+  }
+  if (item.question.id === item.id) {
+    issues.push(issue(item.id, 'duplicate-id', 'Lesson and exit question must have different ids.'));
+  }
+  issues.push(...validateQuestion(item.question, skills));
 
   return issues;
 }
@@ -166,16 +173,81 @@ export function validateContent(item: StudentContent, skills: Record<string, Lea
 }
 
 export function validateCatalogue(items: StudentContent[], skills: Record<string, LearningSkill>): ContentIssue[] {
-  const issues = items.flatMap((item) => validateContent(item, skills));
+  const issues = [...validateSkillGraph(skills), ...items.flatMap((item) => validateContent(item, skills))];
   const seenIds = new Set<string>();
 
   for (const item of items) {
-    if (seenIds.has(item.id)) {
-      issues.push(issue(item.id, 'duplicate-id', 'Content ids must be unique within a catalogue.'));
+    for (const id of 'question' in item ? [item.id, item.question.id] : [item.id]) {
+      if (seenIds.has(id)) {
+        issues.push(issue(id, 'duplicate-id', 'Content ids must be unique within a catalogue, including lesson exit questions.'));
+      }
+      seenIds.add(id);
     }
-    seenIds.add(item.id);
   }
 
   return issues;
 }
 
+export function validateSkillGraph(skills: Record<string, LearningSkill>): ContentIssue[] {
+  const issues: ContentIssue[] = [];
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+
+  function visit(skillId: string): void {
+    const skill = skills[skillId];
+    if (!skill || visited.has(skillId)) return;
+    if (visiting.has(skillId)) {
+      issues.push(issue(skillId, 'skill-cycle', 'Skill prerequisites must not contain a cycle.'));
+      return;
+    }
+    visiting.add(skillId);
+    if (skill.id !== skillId) issues.push(issue(skillId, 'skill-key-mismatch', 'Skill map key must match skill id.'));
+    for (const prerequisiteId of skill.prerequisiteIds) {
+      const prerequisite = skills[prerequisiteId];
+      if (!prerequisite) {
+        issues.push(issue(skillId, 'unknown-prerequisite', `Unknown prerequisite: ${prerequisiteId}.`));
+      } else {
+        if (prerequisite.minimumGrade > skill.minimumGrade) {
+          issues.push(issue(skillId, 'future-prerequisite', 'Prerequisite cannot start in a later grade.'));
+        }
+        visit(prerequisiteId);
+      }
+    }
+    visiting.delete(skillId);
+    visited.add(skillId);
+  }
+
+  Object.keys(skills).forEach(visit);
+  return issues;
+}
+
+const allowedTransitions: Record<ContentMetadata['status'], ContentMetadata['status'][]> = {
+  draft: ['reviewed'],
+  reviewed: ['published', 'draft'],
+  published: ['archived'],
+  archived: [],
+};
+
+export function validateContentRevision(previous: StudentContent, next: StudentContent, skills: Record<string, LearningSkill>): ContentIssue[] {
+  const issues = validateContent(next, skills);
+  const kind = (item: StudentContent) => 'type' in item ? item.type : 'lesson';
+  if (previous.id !== next.id || kind(previous) !== kind(next)) {
+    issues.push(issue(next.id, 'revision-identity', 'A revision must keep the same id and content type.'));
+  }
+  if (next.version !== previous.version + 1) {
+    issues.push(issue(next.id, 'revision-version', 'A revision must increment the version by one.'));
+  }
+  if (!allowedTransitions[previous.status].includes(next.status)) {
+    issues.push(issue(next.id, 'invalid-status-transition', `Cannot move from ${previous.status} to ${next.status}.`));
+  }
+  if (previous.status === 'reviewed' && next.status === 'published') {
+    const withoutTransitionFields = (item: StudentContent) => {
+      const { status: _status, version: _version, ...reviewedPayload } = item;
+      return reviewedPayload;
+    };
+    if (JSON.stringify(withoutTransitionFields(previous)) !== JSON.stringify(withoutTransitionFields(next))) {
+      issues.push(issue(next.id, 'changed-after-review', 'Publishing cannot change reviewed content or its review evidence.'));
+    }
+  }
+  return issues;
+}

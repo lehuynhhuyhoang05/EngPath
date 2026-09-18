@@ -202,10 +202,15 @@ async function runFlow(client) {
   await expectText(client, 'Bài đầu tiên:');
   await clickText(client, 'Bắt đầu nhiệm vụ đầu tiên');
   await expectText(client, 'Kiểm tra đáp án');
+  await expectText(client, 'Sau bài này:');
+  await clickText(client, 'Báo nội dung có vấn đề');
+  await clickText(client, 'Giải thích khó hiểu');
+  await expectText(client, 'Đã lưu báo cáo trên máy');
   await clickText(client, 'is');
   await evaluate(client, 'location.reload(); true');
   await waitFor(client, 'document.readyState === "complete"', 'lesson draft reload');
   await expectText(client, 'Kiểm tra đáp án');
+  await expectText(client, 'Đã lưu báo cáo trên máy');
   await clickText(client, 'Kiểm tra đáp án');
   await expectText(client, 'Mình sửa chỗ này nhé');
   await clickText(client, 'Hoàn thành bài');

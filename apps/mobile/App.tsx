@@ -3,10 +3,11 @@ import { Platform, StatusBar as NativeStatusBar, StyleSheet, Text, View } from '
 import { StatusBar } from 'expo-status-bar';
 import { diagnosticQuestionsForGrade, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT, SKILLS } from './src/data/seed';
 import { scoreDiagnostic } from './src/domain/diagnostic';
+import { recordContentReport } from './src/domain/contentReports';
 import { masteryStatesFromDiagnostic, updateMasteryWithLessonAnswer } from './src/domain/mastery';
 import { recordLessonAnswer } from './src/domain/mistakes';
 import { recommendSkillIdForState } from './src/domain/recommendation';
-import type { LearnerProfile, Lesson, StoredAppState } from './src/domain/models';
+import type { ContentReportReason, LearnerProfile, Lesson, StoredAppState } from './src/domain/models';
 import type { AppRoute, MainTab } from './src/navigation/routes';
 import { DiagnosticResultScreen, DiagnosticScreen } from './src/screens/DiagnosticScreens';
 import { LessonScreen, PronunciationScreen } from './src/screens/LearningScreens';
@@ -20,6 +21,7 @@ const EMPTY_STATE: StoredAppState = {
   lessonDrafts: {},
   masteryStates: {},
   mistakeRecords: [],
+  contentReports: [],
   completedLessonIds: [],
   completedSessions: 0,
 };
@@ -139,6 +141,13 @@ export default function App() {
     }));
   }, []);
 
+  const reportLessonContent = useCallback((lesson: Lesson, reason: ContentReportReason) => {
+    setState((current) => ({
+      ...current,
+      contentReports: recordContentReport(current.contentReports, lesson.question.id, lesson.question.version, reason),
+    }));
+  }, []);
+
   const completePronunciation = () => {
     setState((current) => ({ ...current, completedSessions: current.completedSessions + 1 }));
     setActiveTab('practice');
@@ -168,7 +177,7 @@ export default function App() {
     if (route === 'diagnostic-intro') return <DiagnosticIntroScreen grade={state.profile.grade} hasDraft={state.diagnosticDraft?.grade === state.profile.grade} onStart={() => setRoute('diagnostic')} onBack={() => setRoute('onboarding')} />;
     if (route === 'diagnostic') return <DiagnosticScreen questions={questions} initialAnswers={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.answers : undefined} initialIndex={state.diagnosticDraft?.grade === state.profile.grade ? state.diagnosticDraft.currentIndex : undefined} onProgress={saveDiagnosticDraft} onComplete={completeDiagnostic} onExit={() => setRoute(state.diagnostic ? 'main' : 'diagnostic-intro')} />;
     if (route === 'result' && state.diagnostic) return <DiagnosticResultScreen result={state.diagnostic} onStart={openPriorityLesson} />;
-    if (route === 'lesson') return <LessonScreen key={selectedLesson.id} lesson={selectedLesson} initialDraft={state.lessonDrafts[selectedLesson.id]} onProgress={saveLessonDraft} onChecked={recordAnswer} onBack={leaveLesson} onComplete={completeLesson} />;
+    if (route === 'lesson') return <LessonScreen key={selectedLesson.id} lesson={selectedLesson} initialDraft={state.lessonDrafts[selectedLesson.id]} hasReport={state.contentReports.some((report) => report.contentId === selectedLesson.question.id && report.contentVersion === selectedLesson.question.version)} onProgress={saveLessonDraft} onChecked={recordAnswer} onReport={reportLessonContent} onBack={leaveLesson} onComplete={completeLesson} />;
     if (route === 'pronunciation') return <PronunciationScreen prompt={PRONUNCIATION_PROMPT} bestScore={state.pronunciationBestScore} onBack={() => setRoute('main')} onScore={(score) => setState((current) => ({ ...current, pronunciationBestScore: Math.max(current.pronunciationBestScore ?? 0, score) }))} onComplete={completePronunciation} />;
     if (route === 'exam') return <ExamScreen onBack={() => { setActiveTab('practice'); setRoute('main'); }} />;
     if (route === 'mistakes') return <MistakeNotebookScreen records={state.mistakeRecords} onBack={() => { setActiveTab('practice'); setRoute('main'); }} onRetry={(lessonId) => { setSelectedLessonId(lessonId); setState((current) => ({ ...current, activeLessonId: lessonId })); setRoute('lesson'); }} />;

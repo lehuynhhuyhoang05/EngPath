@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ChoiceQuestion } from '../domain/models';
-import { validateCatalogue, validateContent } from './contentValidation';
+import { validateCatalogue, validateContent, validateContentRevision, validateSkillGraph } from './contentValidation';
 import { DIAGNOSTIC_QUESTIONS, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT, SKILLS } from './seed';
 
 describe('prototype learning content', () => {
@@ -17,6 +17,16 @@ describe('prototype learning content', () => {
     for (const item of content) {
       expect(item.authoringMethod).toBe('ai-assisted');
       expect(item.status).toBe('draft');
+    }
+  });
+
+  it('teaches with a separate exit check for every seeded lesson', () => {
+    const diagnosticIds = new Set(DIAGNOSTIC_QUESTIONS.map((item) => item.id));
+    for (const lesson of Object.values(LESSONS_BY_SKILL)) {
+      expect(lesson.learningObjectiveVi.length).toBeGreaterThan(20);
+      expect(lesson.example).not.toContain('___');
+      expect(diagnosticIds.has(lesson.question.id)).toBe(false);
+      expect(lesson.question.prompt).not.toBe(lesson.example);
     }
   });
 
@@ -47,5 +57,38 @@ describe('prototype learning content', () => {
     expect(codes).toContain('missing-reviewer');
     expect(codes).toContain('missing-review-date');
     expect(codes).toContain('placeholder-source');
+  });
+
+  it('checks the nested exit question and its id', () => {
+    const lesson = LESSONS_BY_SKILL['there-be'];
+    const invalid = { ...lesson, question: { ...lesson.question, id: DIAGNOSTIC_QUESTIONS[0].id, options: ['are', ' ARE '] } };
+    const codes = validateCatalogue([DIAGNOSTIC_QUESTIONS[0], invalid], SKILLS).map((entry) => entry.code);
+    expect(codes).toContain('duplicate-id');
+    expect(codes).toContain('duplicate-options');
+  });
+
+  it('rejects cycles and references to future skills', () => {
+    const invalid = {
+      ...SKILLS,
+      'present-simple': { ...SKILLS['present-simple'], prerequisiteIds: ['relative-clause'] },
+    };
+    const codes = validateSkillGraph(invalid).map((entry) => entry.code);
+    expect(codes).toContain('skill-cycle');
+    expect(codes).toContain('future-prerequisite');
+  });
+
+  it('requires an incremented, reviewed revision before publication', () => {
+    const original = DIAGNOSTIC_QUESTIONS[0];
+    const premature = { ...original, status: 'published' as const, version: 2 };
+    const codes = validateContentRevision(original, premature, SKILLS).map((entry) => entry.code);
+    expect(codes).toContain('invalid-status-transition');
+    expect(codes).toContain('missing-reviewer');
+
+    const reviewed = { ...original, status: 'reviewed' as const, version: 2, source: { title: 'EngPath original practice sentence reviewed by educator' }, review: { reviewerId: 'educator-01', reviewedAt: '2026-09-18' } };
+    expect(validateContentRevision(original, reviewed, SKILLS)).toEqual([]);
+    const published = { ...reviewed, status: 'published' as const, version: 3 };
+    expect(validateContentRevision(reviewed, published, SKILLS)).toEqual([]);
+    const changedAnswer = { ...published, correctOptionIndex: 0 };
+    expect(validateContentRevision(reviewed, changedAnswer, SKILLS).map((entry) => entry.code)).toContain('changed-after-review');
   });
 });

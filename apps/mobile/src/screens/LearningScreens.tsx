@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Lesson, LessonDraft, PronunciationPrompt } from '../domain/models';
+import type { ContentReportReason, Lesson, LessonDraft, PronunciationPrompt } from '../domain/models';
 import { BackButton, Button, Icon, Pill, ProgressBar, Screen, TextButton } from '../ui/components';
 import { colors, radii, spacing, type } from '../ui/theme';
 
-export function LessonScreen({ lesson, initialDraft, onProgress, onChecked, onBack, onComplete }: {
+export function LessonScreen({ lesson, initialDraft, hasReport, onProgress, onChecked, onReport, onBack, onComplete }: {
   lesson: Lesson;
   initialDraft?: LessonDraft;
+  hasReport?: boolean;
   onProgress?: (lessonId: string, selectedOptionIndex: number | undefined, checked: boolean) => void;
   onChecked?: (lesson: Lesson, selectedOptionIndex: number) => void;
+  onReport?: (lesson: Lesson, reason: ContentReportReason) => void;
   onBack: () => void;
   onComplete: () => void;
 }) {
   const [selected, setSelected] = useState<number | undefined>(initialDraft?.selectedOptionIndex);
   const [checked, setChecked] = useState(initialDraft?.checked ?? false);
-  const [reported, setReported] = useState(false);
+  const [reportReasonOpen, setReportReasonOpen] = useState(false);
   const correct = selected === lesson.question.correctOptionIndex;
 
   useEffect(() => {
@@ -36,6 +38,7 @@ export function LessonScreen({ lesson, initialDraft, onProgress, onChecked, onBa
       <Text style={styles.stepLabel}>HIỂU · BƯỚC 1/4</Text>
       <Text style={styles.title}>{lesson.title}</Text>
       <Text style={styles.lead}>{lesson.summary}</Text>
+      <Text style={styles.objective}>Sau bài này: {lesson.learningObjectiveVi}</Text>
       <ProgressBar value={checked ? 0.75 : 0.45} label={checked ? 'Bước giải thích' : 'Bước thử'} />
 
       <View style={styles.ruleCard}>
@@ -77,7 +80,17 @@ export function LessonScreen({ lesson, initialDraft, onProgress, onChecked, onBa
         </View>
       ) : null}
 
-      {!reported ? <TextButton label="Báo nội dung có vấn đề" onPress={() => setReported(true)} /> : <Text accessibilityLiveRegion="polite" style={styles.reported}>Đã ghi nhận. Tính năng gửi báo cáo cho đội nội dung sẽ được thêm sau.</Text>}
+      {hasReport ? (
+        <Text accessibilityLiveRegion="polite" style={styles.reported}>Đã lưu báo cáo trên máy. Báo cáo chưa được gửi cho đội nội dung.</Text>
+      ) : reportReasonOpen ? (
+        <View style={styles.reportOptions}>
+          <Text style={styles.reportPrompt}>Em thấy vấn đề ở đâu?</Text>
+          <TextButton label="Đáp án có thể sai" onPress={() => onReport?.(lesson, 'answer')} />
+          <TextButton label="Giải thích khó hiểu" onPress={() => onReport?.(lesson, 'explanation')} />
+          <TextButton label="Lỗi chính tả" onPress={() => onReport?.(lesson, 'typo')} />
+          <TextButton label="Hủy" onPress={() => setReportReasonOpen(false)} />
+        </View>
+      ) : <TextButton label="Báo nội dung có vấn đề" onPress={() => setReportReasonOpen(true)} />}
     </Screen>
   );
 }
@@ -166,6 +179,7 @@ const styles = StyleSheet.create({
   stepLabel: { ...type.caption, color: colors.primary, letterSpacing: 0.9, marginTop: spacing.md },
   title: { ...type.title, color: colors.ink, marginTop: spacing.xs },
   lead: { ...type.body, color: colors.muted, marginTop: spacing.xs, marginBottom: spacing.lg },
+  objective: { ...type.bodyStrong, color: colors.inkSoft, borderLeftWidth: 3, borderLeftColor: colors.primary, paddingLeft: spacing.sm },
   ruleCard: { borderLeftWidth: 3, borderLeftColor: colors.accent, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line, padding: spacing.lg, backgroundColor: colors.surface, marginVertical: spacing.xl },
   ruleHeading: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
   ruleIndex: { color: colors.lineStrong, fontSize: 27, lineHeight: 32, fontWeight: '500' },
@@ -191,7 +205,9 @@ const styles = StyleSheet.create({
   feedbackTitle: { ...type.heading },
   feedbackBody: { ...type.body, color: colors.inkSoft, marginTop: spacing.xs },
   nearExample: { ...type.bodyStrong, color: colors.ink, marginTop: spacing.sm },
-  reported: { ...type.caption, color: colors.success, textAlign: 'center', paddingVertical: spacing.md },
+  reported: { ...type.caption, color: colors.inkSoft, textAlign: 'center', paddingVertical: spacing.md },
+  reportOptions: { borderTopWidth: 1, borderTopColor: colors.line, paddingVertical: spacing.md },
+  reportPrompt: { ...type.bodyStrong, color: colors.inkSoft, textAlign: 'center' },
   speechCard: { alignItems: 'center', paddingVertical: spacing.xl, borderTopWidth: 3, borderTopColor: colors.accent, borderBottomWidth: 1, borderBottomColor: colors.line },
   listenButton: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, borderRadius: radii.md, borderWidth: 1, borderColor: colors.primary },
   listenText: { ...type.label, color: colors.primary },

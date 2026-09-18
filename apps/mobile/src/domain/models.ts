@@ -53,6 +53,7 @@ export interface Lesson extends ContentMetadata {
   skillId: string;
   title: string;
   summary: string;
+  learningObjectiveVi: string;
   explanationVi: string;
   example: string;
   exampleVi: string;
@@ -117,6 +118,15 @@ export interface MistakeRecord {
   status: 'active' | 'resolved';
 }
 
+export type ContentReportReason = 'answer' | 'explanation' | 'typo';
+
+export interface ContentReport {
+  contentId: string;
+  contentVersion: number;
+  reason: ContentReportReason;
+  createdAt: string;
+}
+
 export interface StoredAppState {
   profile?: LearnerProfile;
   diagnosticDraft?: DiagnosticDraft;
@@ -125,6 +135,7 @@ export interface StoredAppState {
   lessonDrafts: Record<string, LessonDraft>;
   masteryStates: Record<string, MasteryState>;
   mistakeRecords: MistakeRecord[];
+  contentReports: ContentReport[];
   completedLessonIds: string[];
   completedSessions: number;
   pronunciationBestScore?: number;

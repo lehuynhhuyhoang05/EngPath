@@ -2,7 +2,8 @@
 
 Status: Active v1.3  
 Current milestone: M3 — Content engine và learning quality  
-Last reviewed: 2026-09-15  
+Last reviewed: 2026-09-18
+
 Đối tượng lập kế hoạch: một developer chính, có người hỗ trợ duyệt nội dung và tuyển beta  
 Nguyên tắc: **không qua cổng chất lượng thì không chuyển milestone**
 
@@ -27,8 +28,8 @@ Mỗi milestone phải có đủ:
 |---|---|---|
 | Product contract | Đạt cho M2 | Tầm nhìn và phạm vi đúng; nghiên cứu học sinh thật được dời tới lúc có bản đủ ổn để thử |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
-| Prototype local | M2 PASS | Core loop local có diagnostic/lesson resume, mastery v1, prerequisite recommendation, mistake notebook và pronunciation mock; đã mở M3 |
-| Automated tests | Một phần | 29 test Vitest cho diagnostic, mastery, presentation logic, recommendation, mistake notebook, seed data và storage migration; web phone-frame E2E smoke pass; chưa có component test stack chuẩn Expo |
+| Prototype local | M3 đang làm | M2 đã pass; M3 đã tách nội dung bài học khỏi câu chẩn đoán, có objective và exit check riêng; báo lỗi nội dung được lưu cục bộ, chưa gửi đi |
+| Automated tests | Một phần | 34 test Vitest gồm content validation, skill graph, revision, diagnostic/mastery/storage; web phone-frame E2E smoke pass; chưa có component test stack chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |
 | Grade-10 exam | Chưa làm | Mới có entry card, chưa có exam flow hoàn chỉnh |

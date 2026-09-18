@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { StoredAppState } from '../domain/models';
 
 const STORAGE_KEY = '@engpath/app-state/v1';
-const STORAGE_SCHEMA_VERSION = 2;
+const STORAGE_SCHEMA_VERSION = 3;
 
 interface StoredEnvelope {
   schemaVersion: number;
@@ -25,6 +25,7 @@ function normalizeStoredState(state: StoredAppState): StoredAppState {
     lessonDrafts: isRecord(state.lessonDrafts) ? state.lessonDrafts : {},
     masteryStates: isRecord(state.masteryStates) ? state.masteryStates : {},
     mistakeRecords: Array.isArray(state.mistakeRecords) ? state.mistakeRecords : [],
+    contentReports: Array.isArray(state.contentReports) ? state.contentReports : [],
   };
 }
 

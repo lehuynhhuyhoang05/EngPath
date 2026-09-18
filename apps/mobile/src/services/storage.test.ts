@@ -19,6 +19,7 @@ const state: StoredAppState = {
   lessonDrafts: {},
   masteryStates: {},
   mistakeRecords: [],
+  contentReports: [],
   completedLessonIds: ['lesson-present-simple-01'],
   completedSessions: 2,
 };
@@ -30,7 +31,7 @@ describe('local app storage', () => {
 
   it('serializes state with a schema version envelope', () => {
     expect(JSON.parse(serializeAppState(state))).toEqual({
-      schemaVersion: 2,
+      schemaVersion: 3,
       state,
     });
   });
@@ -51,6 +52,7 @@ describe('local app storage', () => {
       lessonDrafts: {},
       masteryStates: {},
       mistakeRecords: [],
+      contentReports: [],
     });
   });
 

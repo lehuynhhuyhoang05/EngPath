@@ -48,22 +48,43 @@ export function diagnosticQuestionsForGrade(grade: Grade): ChoiceQuestion[] {
   return DIAGNOSTIC_QUESTIONS.filter((item) => item.grade <= grade);
 }
 
-function lesson(skillId: string, grade: Grade, item: ChoiceQuestion): Lesson {
+interface LessonSeed {
+  objective: string;
+  rule: string;
+  example: string;
+  exampleVi: string;
+  question: [string, string[], number, string, string];
+}
+
+const LESSON_SEEDS: Record<string, LessonSeed> = {
+  'present-simple': { objective: 'Chọn đúng dạng động từ ở hiện tại đơn với chủ ngữ ngôi thứ ba số ít.', rule: 'Với he, she, it hoặc tên một người, thêm -s hoặc -es vào động từ trong câu khẳng định hiện tại đơn.', example: 'Minh walks to school every morning.', exampleVi: 'Minh đi bộ đến trường mỗi sáng; “Minh” là ngôi thứ ba số ít nên “walk” thêm -s.', question: ['My sister ___ TV after school.', ['watch', 'watches', 'watched', 'watching'], 1, '“My sister” là ngôi thứ ba số ít; “watch” thêm -es thành “watches”.', 'Dùng động từ nguyên mẫu dù chủ ngữ là ngôi thứ ba số ít.'] },
+  'there-be': { objective: 'Chọn is hoặc are theo số lượng danh từ đứng sau there.', rule: 'Trong câu hiện tại, dùng “There is” với danh từ số ít và “There are” với danh từ số nhiều.', example: 'There is one chair beside the desk.', exampleVi: 'Có một chiếc ghế cạnh bàn; “one chair” là số ít nên dùng “is”.', question: ['There ___ three windows in this room.', ['is', 'are', 'was', 'be'], 1, '“Three windows” là số nhiều nên dùng “There are”.', 'Nhìn từ “there” mà quên kiểm tra danh từ phía sau.'] },
+  'past-simple': { objective: 'Nhận ra dấu hiệu thời gian đã qua và chọn dạng quá khứ của động từ có quy tắc.', rule: 'Với hành động đã kết thúc trong quá khứ, dùng dạng quá khứ; động từ có quy tắc thường thêm -ed.', example: 'They visited Da Lat last summer.', exampleVi: 'Họ đã thăm Đà Lạt mùa hè trước; “last summer” chỉ thời gian đã qua.', question: ['Hoa ___ her aunt yesterday.', ['visits', 'visited', 'visit', 'is visiting'], 1, '“Yesterday” chỉ thời gian đã qua, nên “visit” đổi thành “visited”.', 'Bỏ qua “yesterday” và chọn dạng hiện tại.'] },
+  'adjective-adverb': { objective: 'Phân biệt tính từ và trạng từ khi bổ nghĩa cho động từ.', rule: 'Một trạng từ thường bổ nghĩa cho cách thực hiện hành động; nhiều trạng từ được tạo bằng cách thêm -ly vào tính từ.', example: 'He speaks clearly.', exampleVi: 'Anh ấy nói rõ ràng; “clearly” mô tả cách anh ấy nói.', question: ['The students listened ___ to the teacher.', ['careful', 'carefully', 'care', 'caring'], 1, '“Listened” là động từ; “carefully” diễn tả cách lắng nghe.', 'Dùng tính từ “careful” để bổ nghĩa trực tiếp cho động từ.'] },
+  comparison: { objective: 'Dùng dạng so sánh hơn của tính từ ngắn khi có than.', rule: 'Tính từ ngắn thường thêm -er trước “than”; tính từ kết thúc bằng -y thường đổi y thành i rồi thêm -er.', example: 'This bag is lighter than that one.', exampleVi: 'Chiếc túi này nhẹ hơn chiếc kia; “light” thêm -er.', question: ['This street is ___ than my street.', ['narrow', 'narrower', 'narrowest', 'more narrowest'], 1, 'Có “than” nên dùng dạng so sánh hơn “narrower”.', 'Dùng dạng gốc hoặc so sánh nhất trước “than”.'] },
+  'present-perfect': { objective: 'Dùng have/has + quá khứ phân từ cho trạng thái bắt đầu trong quá khứ và còn tiếp diễn.', rule: 'Với “since” chỉ mốc bắt đầu của trạng thái còn tiếp diễn, thường dùng hiện tại hoàn thành: have/has + quá khứ phân từ.', example: 'I have lived here since 2020.', exampleVi: 'Tôi sống ở đây từ năm 2020 đến nay; “have lived” nối quá khứ với hiện tại.', question: ['She ___ at this school since 2021.', ['studies', 'studied', 'has studied', 'is studying'], 2, '“Since 2021” cho biết việc học bắt đầu trước đây và còn tiếp diễn; “she” đi với “has studied”.', 'Chọn quá khứ đơn dù “since” nối mốc bắt đầu với hiện tại.'] },
+  'relative-clause': { objective: 'Dùng who để nối mệnh đề bổ nghĩa cho một người.', rule: 'Dùng “who” làm chủ ngữ của mệnh đề quan hệ khi danh từ phía trước chỉ người.', example: 'The girl who sings is my friend.', exampleVi: 'Cô gái đang hát là bạn tôi; “who” thay cho “the girl”.', question: ['The teacher ___ helped me is very kind.', ['which', 'who', 'where', 'when'], 1, '“The teacher” chỉ người và là chủ ngữ của “helped”, nên dùng “who”.', 'Dùng “which” cho người hoặc dùng từ chỉ nơi chốn/thời gian.'] },
+  'first-conditional': { objective: 'Hoàn thành mệnh đề kết quả của điều kiện có thể xảy ra trong tương lai.', rule: 'Câu điều kiện loại 1 thường có “If + hiện tại đơn, will + động từ nguyên mẫu” để nói về khả năng trong tương lai.', example: 'If I finish early, I will call you.', exampleVi: 'Nếu xong sớm, tôi sẽ gọi bạn; điều kiện có thể xảy ra.', question: ['If you study tonight, you ___ the lesson better.', ['understand', 'understood', 'will understand', 'would understand'], 2, 'Điều kiện “If you study” ở hiện tại đơn; kết quả có thể xảy ra dùng “will understand”.', 'Dùng “would” của câu điều kiện loại 2.'] },
+};
+
+function lesson(skillId: string, grade: Grade): Lesson {
+  const seed = LESSON_SEEDS[skillId];
   return {
     id: `lesson-${skillId}-01`, grade, skills: [skillId], skillId,
     prerequisites: SKILLS[skillId].prerequisiteIds, difficulty: 'foundation', status: 'draft',
     authoringMethod: 'ai-assisted', source, review: pendingReview(), version: 1,
     title: `Làm chắc ${SKILLS[skillId].title}`,
     summary: `Ôn nhanh ${SKILLS[skillId].title.toLowerCase()} qua một quy tắc và một câu luyện tập.`,
-    explanationVi: item.explanationVi,
-    example: item.prompt.replace('___', item.options[item.correctOptionIndex]),
-    exampleVi: 'Quan sát vị trí của từ và dấu hiệu trong câu để chọn đúng dạng.',
-    question: item,
+    learningObjectiveVi: seed.objective,
+    explanationVi: seed.rule,
+    example: seed.example,
+    exampleVi: seed.exampleVi,
+    question: question(`exit-${skillId}-01`, grade, skillId, ...seed.question),
   };
 }
 
 export const LESSONS_BY_SKILL: Record<string, Lesson> = Object.fromEntries(
-  DIAGNOSTIC_QUESTIONS.map((item) => [item.skillId, lesson(item.skillId, item.grade, item)]),
+  DIAGNOSTIC_QUESTIONS.map((item) => [item.skillId, lesson(item.skillId, item.grade)]),
 );
 
 export const PRONUNCIATION_PROMPT: PronunciationPrompt = {
