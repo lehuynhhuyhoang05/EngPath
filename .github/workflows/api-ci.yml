@@ -1,0 +1,53 @@
+name: API quality
+
+on:
+  push:
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/api-ci.yml'
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/api-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: engpath_test
+          POSTGRES_PASSWORD: engpath_test
+          POSTGRES_DB: engpath_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U engpath_test -d engpath_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://engpath_test:engpath_test@localhost:5432/engpath_test
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run migrate:up
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm run migrate:down

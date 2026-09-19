@@ -45,3 +45,5 @@ To inspect the phone-frame UI on this laptop, run `npm run web -- --port 8082 --
 ## Current milestone
 
 M0–M3 have passed at their recorded scopes. The [M3 gate](docs/gates/M3-2026-09-19.md) records the two supplied grade-9 review forms and the explicit decision to test learner comprehension after the app has a stable Android build, before private beta. M4 backend, safe sync and privacy deletion are not implemented yet; the app remains local-first.
+
+The first M4 backend slice lives in [apps/api](apps/api/README.md): a NestJS API with PostgreSQL-backed guest sessions and idempotent content-report intake. It is not connected to mobile yet and must not be publicly deployed in this incomplete state.
