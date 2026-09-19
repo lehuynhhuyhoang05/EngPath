@@ -7,7 +7,7 @@ export const CONTENT_SCHEMA_VERSION = 1;
 export const CATALOGUE = {
   id: 'engpath-prototype',
   schemaVersion: CONTENT_SCHEMA_VERSION,
-  revision: 1,
+  revision: 2,
   skills: SKILLS,
   diagnostics: DIAGNOSTIC_QUESTIONS,
   lessons: Object.values(LESSONS_BY_SKILL),

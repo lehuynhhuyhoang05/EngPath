@@ -1,4 +1,5 @@
 import type { ChoiceQuestion, GoalOption, Grade, LearningSkill, Lesson, PronunciationPrompt } from '../domain/models';
+import { m3ReviewMetadata } from './m3Review';
 
 export const GRADES: Grade[] = [6, 7, 8, 9];
 
@@ -23,12 +24,13 @@ export const SKILLS: Record<string, LearningSkill> = {
 };
 
 const source = { title: 'EngPath original prototype item; requires educator review before publication' };
+const reviewedSource = { title: 'Original EngPath grade-9 grammar practice; review evidence in docs/content/M3-REVIEW-RESULTS.md' };
 const pendingReview = () => ({});
 
 function question(id: string, grade: Grade, skillId: string, prompt: string, options: string[], correctOptionIndex: number, explanationVi: string, commonErrorVi: string): ChoiceQuestion {
   return {
     id, grade, skills: [skillId], skillId, prerequisites: SKILLS[skillId].prerequisiteIds,
-    difficulty: 'core', status: 'draft', authoringMethod: 'ai-assisted', source, review: pendingReview(), version: 1,
+    difficulty: 'core', authoringMethod: 'ai-assisted', ...m3ReviewMetadata(id, source, reviewedSource),
     type: 'single-choice', prompt, options, correctOptionIndex, explanationVi, commonErrorVi,
   };
 }
@@ -79,8 +81,8 @@ function lesson(skillId: string, grade: Grade): Lesson {
   const seed = LESSON_SEEDS[skillId];
   return {
     id: `lesson-${skillId}-01`, grade, skills: [skillId], skillId,
-    prerequisites: SKILLS[skillId].prerequisiteIds, difficulty: 'foundation', status: 'draft',
-    authoringMethod: 'ai-assisted', source, review: pendingReview(), version: 1,
+    prerequisites: SKILLS[skillId].prerequisiteIds, difficulty: 'foundation',
+    authoringMethod: 'ai-assisted', ...m3ReviewMetadata(`lesson-${skillId}-01`, source, reviewedSource),
     title: `Làm chắc ${SKILLS[skillId].title}`,
     summary: `Ôn nhanh ${SKILLS[skillId].title.toLowerCase()} qua một quy tắc và một câu luyện tập.`,
     learningObjectiveVi: seed.objective,

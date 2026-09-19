@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOGUE, CONTENT_SCHEMA_VERSION, validatePrototypeCatalogue } from './catalogue';
 import { EXAM_SAMPLE_QUESTIONS, EXAM_SAMPLE_TEMPLATE, scoreExamSample, validateExamSample } from './examSample';
+import { M3_REVIEWED_CONTENT_IDS } from './m3Review';
 import { diagnosticQuestionsForGrade, LESSONS_BY_SKILL, SKILLS } from './seed';
 
 describe('M3 prototype catalogue', () => {
@@ -15,11 +16,18 @@ describe('M3 prototype catalogue', () => {
     expect(validatePrototypeCatalogue()).toEqual([]);
   });
 
-  it('keeps exam content as an original, unreviewed practice sample', () => {
+  it('records the reviewed questions without publishing an exam template', () => {
     expect(EXAM_SAMPLE_TEMPLATE.kind).toBe('practice-sample');
     expect(EXAM_SAMPLE_TEMPLATE.status).toBe('draft');
     expect(EXAM_SAMPLE_TEMPLATE.source.title).toContain('not an official provincial exam');
-    expect(EXAM_SAMPLE_QUESTIONS.every((question) => question.status === 'draft')).toBe(true);
+    expect(EXAM_SAMPLE_QUESTIONS.every((question) => question.status === 'reviewed' && question.version === 2)).toBe(true);
+    const reviewedIds = [
+      ...CATALOGUE.diagnostics,
+      ...CATALOGUE.lessons.flatMap((lesson) => [lesson, lesson.question]),
+      ...EXAM_SAMPLE_QUESTIONS,
+    ].filter((item) => item.status === 'reviewed').map((item) => item.id);
+    expect(new Set(reviewedIds)).toEqual(M3_REVIEWED_CONTENT_IDS);
+    expect(CATALOGUE.revision).toBe(2);
   });
 
   it('scores correct, wrong and unanswered questions deterministically by skill', () => {

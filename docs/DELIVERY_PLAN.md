@@ -1,8 +1,8 @@
 # EngPath — Kế hoạch phát triển và Quality Gates
 
-Status: Active v1.3  
-Current milestone: M3 — Content engine và learning quality  
-Last reviewed: 2026-09-18
+Status: Active v1.4
+Current milestone: M4 — Backend, account và sync
+Last reviewed: 2026-09-19
 
 Đối tượng lập kế hoạch: một developer chính, có người hỗ trợ duyệt nội dung và tuyển beta  
 Nguyên tắc: **không qua cổng chất lượng thì không chuyển milestone**
@@ -28,14 +28,14 @@ Mỗi milestone phải có đủ:
 |---|---|---|
 | Product contract | Đạt cho M2 | Tầm nhìn và phạm vi đúng; nghiên cứu học sinh thật được dời tới lúc có bản đủ ổn để thử |
 | Quyết định nền tảng | Đạt | React Native/Expo, Android-first đã được ghi bằng ADR |
-| Prototype local | M3 đang làm | Hai chủ điểm mỗi lớp, chẩn đoán 8–14 câu, lesson objective/exit check riêng, mẫu luyện thi lớp 9 dạng dữ liệu; báo lỗi chẩn đoán/bài học/phát âm được lưu cục bộ, chưa gửi đi |
+| Prototype local | M3 đã qua gate, M4 đang làm | Hai chủ điểm mỗi lớp, chẩn đoán 8–14 câu, lesson objective/exit check riêng; 7 câu và 2 bài lớp 9 đã `reviewed`, chưa `published`; báo lỗi còn lưu cục bộ |
 | Automated tests | Một phần | 40 test Vitest gồm content/exam validation, skill graph, revision, scoring, diagnostic/mastery/storage; web phone-frame E2E smoke pass; chưa có component test stack chuẩn Expo |
 | Pronunciation | Mock | Chưa thu âm, chưa có provider, consent hoặc deletion verification |
 | Backend/sync | Chưa làm | Chưa có API/PostgreSQL |
 | Grade-10 exam | M3 content draft | Có mẫu luyện thi 3 câu và schema/template chấm điểm; app mới có entry card, màn làm đề thuộc M6; chưa gắn tỉnh/năm chính thức |
 | Beta readiness | Chưa đạt | Chưa có APK beta, analytics tối thiểu, privacy flow hoặc field test |
 
-Prototype hiện tại đã qua M2 local vertical slice. [M0 gate](gates/M0-2026-09-15.md), [M1 gate](gates/M1-2026-09-15.md) và [M2 gate](gates/M2-2026-09-15.md) đã pass; M3 hiện active để đưa content thành dữ liệu có version, review và kiểm định chất lượng.
+Prototype hiện tại đã qua M3 ở phạm vi content engine local. [M0 gate](gates/M0-2026-09-15.md), [M1 gate](gates/M1-2026-09-15.md), [M2 gate](gates/M2-2026-09-15.md) và [M3 gate](gates/M3-2026-09-19.md) đã pass; M4 triển khai backend/sync. M3 không đồng nghĩa với việc toàn bộ content đã được publish.
 
 ## 3. Luật qua cổng chung
 
@@ -208,6 +208,7 @@ Test bắt buộc:
 Gate M3:
 
 - 100% published items có source, explanation, skill tag, revision và reviewer.
+- Nếu prototype chưa có published item, validator và test phải chặn việc publish thiếu các trường trên; không dùng tập published rỗng để khẳng định nội dung đã được duyệt.
 - Không có MCQ trùng đáp án hoặc khác không đúng duy nhất một đáp án.
 - Mỗi lesson có learning objective và exit check.
 - Tối thiểu hai người duyệt độc lập sample grade 9/exam; bất đồng được ghi lại.
@@ -218,7 +219,9 @@ Test bắt buộc:
 - schema and referential-integrity tests;
 - duplicate/answer uniqueness tests;
 - deterministic scoring tests;
-- educator review sample và learner comprehension sample.
+- hai phiếu duyệt độc lập sample lớp 9/thi và owner walkthrough nội bộ về mục tiêu, lời giải, báo lỗi.
+
+Quan sát học sinh thật về mức hiểu lời giải được dời sang gate M7, sau khi app có build Android đủ ổn để đưa người ngoài team thử. Quyết định này giữ đúng nguyên tắc đã áp dụng ở M1: không yêu cầu học sinh thật thử một prototype còn dang dở, nhưng không bỏ kiểm chứng trước private beta.
 
 ### M4 — Backend, account và sync
 
@@ -332,6 +335,7 @@ Gate M7:
 - Cold start, memory, download size và API latency có baseline; không có regression chưa giải thích.
 - Analytics không chứa câu trả lời tự do, audio hoặc PII ngoài policy.
 - Có thể rollback content và app release.
+- Quan sát ít nhất 2–3 học sinh đúng nhóm tuổi: tự hoàn thành một bài ngắn và giải thích được vì sao đáp án sai, không cần người lớn hướng dẫn từng bước; ghi lại điểm không hiểu để sửa trước private beta.
 
 Test bắt buộc:
 
@@ -434,7 +438,7 @@ Next milestone unlocked: YES / NO
 2. Đóng các khoảng trống M0: root Git, CI cơ bản, content validator và research kit.
 3. M1 đã pass bằng wireframe, prototype, design foundation, owner manual review và internal self-audit; learner research thật chuyển sang khi có bản đủ ổn cho học sinh.
 4. M2 đã pass bằng local vertical slice, persistence, mastery/recommendation, mistake notebook, web phone-frame E2E và Android/web bundle smoke.
-5. Đang thực hiện M3: content schema, skill graph, validation, review workflow và sample content chất lượng hơn trước khi đưa content qua API.
-6. Chỉ sau M3 mới triển khai M4 backend/sync.
+5. M3 đã pass ở phạm vi prototype content engine, với hai phiếu duyệt sample lớp 9/thi và chín item `reviewed`; learner comprehension thật vẫn là điều kiện M7 trước beta.
+6. Đang thực hiện M4 backend/sync theo lát cắt nhỏ, giữ app local-first cho tới khi API và offline queue được kiểm thử.
 7. Phát âm thật và thi vào 10 được xây thành hai milestone độc lập để không che lấp rủi ro của nhau.
 8. AI generative feature đứng sau beta evidence; deterministic personalization đi trước.

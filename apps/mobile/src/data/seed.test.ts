@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ChoiceQuestion } from '../domain/models';
 import { validateCatalogue, validateContent, validateContentRevision, validateSkillGraph } from './contentValidation';
+import { M3_REVIEWED_CONTENT_IDS } from './m3Review';
 import { diagnosticQuestionsForGrade, DIAGNOSTIC_QUESTIONS, LESSONS_BY_SKILL, PRONUNCIATION_PROMPT, SKILLS } from './seed';
 
 describe('prototype learning content', () => {
@@ -12,11 +13,15 @@ describe('prototype learning content', () => {
     ], SKILLS)).toEqual([]);
   });
 
-  it('does not mark AI-assisted prototype content as published', () => {
-    const content = [...DIAGNOSTIC_QUESTIONS, PRONUNCIATION_PROMPT];
+  it('marks only the independently reviewed grade-9 packet as reviewed, never published', () => {
+    const content = [...DIAGNOSTIC_QUESTIONS, ...Object.values(LESSONS_BY_SKILL).flatMap((lesson) => [lesson, lesson.question]), PRONUNCIATION_PROMPT];
     for (const item of content) {
       expect(item.authoringMethod).toBe('ai-assisted');
-      expect(item.status).toBe('draft');
+      expect(item.status).toBe(M3_REVIEWED_CONTENT_IDS.has(item.id) ? 'reviewed' : 'draft');
+      expect(item.version).toBe(M3_REVIEWED_CONTENT_IDS.has(item.id) ? 2 : 1);
+      if (item.status === 'reviewed') {
+        expect(item.review).toEqual({ reviewerId: 'english-teacher-01', reviewedAt: '2026-09-18' });
+      }
     }
   });
 

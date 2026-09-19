@@ -3,7 +3,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-const appUrl = process.env.ENGPATH_E2E_URL ?? 'http://localhost:8082';
+let appUrl = process.env.ENGPATH_E2E_URL ?? 'http://localhost:8082';
 const port = Number(process.env.ENGPATH_E2E_CDP_PORT ?? 9322);
 const windowSize = process.env.ENGPATH_E2E_WINDOW_SIZE ?? '420,860';
 const cdpVersionUrl = `http://127.0.0.1:${port}/json/version`;
@@ -259,7 +259,21 @@ async function runFlow(client) {
 }
 
 async function main() {
-  await waitForHttp(appUrl, 5_000);
+  const urls = process.env.ENGPATH_E2E_URL
+    ? [appUrl]
+    : [appUrl, 'http://[::1]:8082', 'http://127.0.0.1:8082'];
+  let lastConnectionError;
+  for (const url of urls) {
+    try {
+      await waitForHttp(url, 2_000);
+      appUrl = url;
+      lastConnectionError = undefined;
+      break;
+    } catch (error) {
+      lastConnectionError = error;
+    }
+  }
+  if (lastConnectionError) throw lastConnectionError;
 
   const userDataDir = await mkdtemp(path.join(tmpdir(), 'engpath-e2e-'));
   let browser;

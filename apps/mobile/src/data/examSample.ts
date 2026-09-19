@@ -1,5 +1,6 @@
 import type { ChoiceQuestion, ExamTemplate, LearningSkill } from '../domain/models';
 import { validateContent, validateContentMetadata, type ContentIssue } from './contentValidation';
+import { m3ReviewMetadata } from './m3Review';
 import { SKILLS } from './seed';
 
 const source = { title: 'Original EngPath exam-style practice written for a prototype; not an official provincial exam' };
@@ -7,8 +8,8 @@ const source = { title: 'Original EngPath exam-style practice written for a prot
 function examQuestion(id: string, skillId: string, prompt: string, options: string[], correctOptionIndex: number, explanationVi: string, commonErrorVi: string): ChoiceQuestion {
   return {
     id, type: 'single-choice', grade: 9, skills: [skillId], skillId,
-    prerequisites: SKILLS[skillId].prerequisiteIds, difficulty: 'core', status: 'draft',
-    authoringMethod: 'ai-assisted', source, review: {}, version: 1,
+    prerequisites: SKILLS[skillId].prerequisiteIds, difficulty: 'core',
+    authoringMethod: 'ai-assisted', ...m3ReviewMetadata(id, source, source),
     prompt, options, correctOptionIndex, explanationVi, commonErrorVi,
   };
 }

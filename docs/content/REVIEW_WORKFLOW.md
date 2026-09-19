@@ -2,7 +2,7 @@
 
 ## Current state
 
-The local catalogue is a prototype. All diagnostic questions, lessons, exit checks and the pronunciation prompt remain `ai-assisted` / `draft`. Passing automated validation does not make an item ready to publish. No educator has reviewed this set yet.
+The local catalogue is a prototype. In revision 2, the seven questions and two lessons in the [M3 grade-9 review packet](M3-GRADE9-REVIEW-PACKET.md) are `ai-assisted` / `reviewed`, with the [two supplied review forms summarized here](M3-REVIEW-RESULTS.md). All other items, the pronunciation prompt and the exam template remain `draft`. Nothing is `published`. Passing automated validation alone does not make an item ready to publish.
 
 ## Revision path
 
@@ -23,4 +23,4 @@ Diagnostic, lesson exit check and pronunciation screens store a selected report 
 - Objective answer and plausible distractors pass independent review; automated checks cannot prove a unique semantic answer.
 - Every lesson has a stated learning objective and a different exit question from the diagnostic item.
 - Grade 9 and exam samples have two independent signed reviews.
-- Use [the grade-9 review packet](M3-GRADE9-REVIEW-PACKET.md) for separate reviews before updating any publication status.
+- Use [the grade-9 review packet](M3-GRADE9-REVIEW-PACKET.md) and preserve the [review result](M3-REVIEW-RESULTS.md) before updating any publication status.
